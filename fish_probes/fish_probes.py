@@ -12,9 +12,14 @@ def main():
 
     # load the input files
     sequences,taxonomy,sel_clade,\
-      min_len,verbose = load_input.load_and_check_input()
+      min_len,verbose,outfile = load_input.load_and_check_input()
     # find probes
-    predict_probes.predict_probes(sequences,taxonomy,sel_clade,min_len)
+    predict_probes.predict_probes(sequences,\
+                                  taxonomy,\
+                                  sel_clade,\
+                                  min_len,\
+                                  verbose,\
+                                  outfile)
 
     sys.stderr.write('Elapsed time: {} s\n'.format( (time.time()-t0) ) )
 

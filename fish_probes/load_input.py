@@ -29,6 +29,10 @@ def input_parser():
     parser.add_argument('-m', action='store', type=int, default=20,
                         dest='min_len', help='Minimum probe length [20]')
 
+    # Output file
+    parser.add_argument('-o', action='store', default=None,
+                        dest='outfile', help='Output file [stdout]')
+
     args = parser.parse_args()
     return args
 
@@ -146,4 +150,5 @@ def load_and_check_input():
     # check that the input is correct
     check_input(sequences,taxonomy,args)
 
-    return sequences,taxonomy,args.sel_clade,args.min_len,args.verbose
+    return sequences,taxonomy,args.sel_clade,args.min_len,args.verbose,\
+             args.outfile
