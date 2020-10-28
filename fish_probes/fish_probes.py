@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 try:
-    from util import load_input, predict_probes
+    from fish_probes import load_input, predict_probes
 except ImportError:
     sys.exit("CRITICAL ERROR: Unable to find the util python package.")
 
