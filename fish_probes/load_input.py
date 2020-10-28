@@ -65,6 +65,27 @@ def load_sequences(sequences_file):
     result[header] = temp_sequence
 
     o.close()
+    return result
+
+# ------------------------------------------------------------------------------
+# Function to load the taxonomy
+# ------------------------------------------------------------------------------
+def load_taxonomy(taxonomy_file):
+    try:
+        o = open(taxonomy_file,"r")
+    except:
+        sys.stderr.write("Cannot load the taxonomy file.\n")
+        sys.exit(1)
+
+    # save result to a dict
+    result = dict()
+    # load file
+    for line in o:
+        vals = line.rstrip().split("\t")
+        result[vals[0]] = vals[1]
+
+    o.close()
+    return result
 
 # ------------------------------------------------------------------------------
 # Main function
