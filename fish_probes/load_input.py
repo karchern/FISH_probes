@@ -52,6 +52,7 @@ def load_sequences(sequences_file):
         sys.exit(1)
     else:
         header = first_line.rstrip()[1:]
+        temp_sequence = ""
     # go through each line
     for line in o:
         if line.startswith(">"):
@@ -86,6 +87,12 @@ def load_taxonomy(taxonomy_file):
 
     o.close()
     return result
+
+# ------------------------------------------------------------------------------
+# Function to check that the input is correct
+# ------------------------------------------------------------------------------
+def check_input(sequences,taxonomy,args):
+    return True
 
 # ------------------------------------------------------------------------------
 # Main function
