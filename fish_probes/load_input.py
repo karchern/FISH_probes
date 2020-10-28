@@ -146,5 +146,4 @@ def load_and_check_input():
     # check that the input is correct
     check_input(sequences,taxonomy,args)
 
-    sys.stderr.write("check \n")
-    return 1,2,3,4
+    return sequences,taxonomy,args.sel_clade,args.min_len,args.verbose

@@ -11,7 +11,8 @@ def main():
     t0 = time.time()
 
     # load the input files
-    sequences,taxonomy,sel_clade,min_len = load_input.load_and_check_input()
+    sequences,taxonomy,sel_clade,\
+      min_len,verbose = load_input.load_and_check_input()
     # find probes
     predict_probes.predict_probes(sequences,taxonomy,sel_clade,min_len)
 
