@@ -92,7 +92,40 @@ def load_taxonomy(taxonomy_file):
 # Function to check that the input is correct
 # ------------------------------------------------------------------------------
 def check_input(sequences,taxonomy,args):
-    return True
+    # check args verbose
+    if args.verbose < 1:
+        sys.stderr.write("Verbose (-v) needs to be lower than 0.\n")
+        sys.exit(1)
+
+    # check min length of the probe
+    if args.min_len < 1:
+        sys.stderr.write("Probe length (-m) cannot be lower than 0.\n")
+        sys.exit(1)
+
+    # check that the clade is in the taxonomy
+    found_clade = False
+    for seq in taxonomy:
+        if args.sel_clade in taxonomy[seq].split(";"):
+            found_clade = True
+    if not found_clade:
+        sys.stderr.write("Selected clade is not present in the taxonomy.\n")
+        sys.exit(1)
+
+    # check that we have a taxonomy annotation for each sequence
+    # NOTE: it can be that there are more taxonomy entries than sequences, but
+    # not the contrary
+    for seq in sequences:
+        if not seq in taxonomy:
+            sys.stderr.write("Sequence '"+seq+"' does not have a taxonomy.\n")
+            sys.exit(1)
+
+    # Remove entries from the taxonomy, if there are no corresponding sequences
+    to_remove = list()
+    for seq in taxonomy:
+        if not seq in sequences:
+            to_remove.append(seq)
+    for r in to_remove:
+        del taxonomy[r]
 
 # ------------------------------------------------------------------------------
 # Main function
