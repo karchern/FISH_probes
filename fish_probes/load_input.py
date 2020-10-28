@@ -43,6 +43,13 @@ def input_parser():
 def load_and_check_input():
     # load sys.argv
     args = input_parser()
+
+    # load data from files
+    sequences = load_sequences(args.sequences)
+    taxonomy = load_taxonomy(args.taxonomy)
+
     # check that the input is correct
+    check_input(sequences,taxonomy,args)
+
     sys.stderr.write("check \n")
     return 1,2,3,4
