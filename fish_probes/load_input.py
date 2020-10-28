@@ -32,6 +32,40 @@ def input_parser():
     args = parser.parse_args()
     return args
 
+
+# ------------------------------------------------------------------------------
+# Function to load the fasta file with the sequences
+# ------------------------------------------------------------------------------
+def load_sequences(sequences_file):
+    try:
+        o = open(sequences_file,"r")
+    except:
+        sys.stderr.write("Cannot load the fasta file with the sequences.\n")
+        sys.exit(1)
+
+    # save result to a dict
+    result = dict()
+    # load file assuming is a fasta file
+    first_line = o.readline()
+    if not(first_line.startswith(">")):
+        sys.stderr.write("Error, not a fasta file.\n")
+        sys.exit(1)
+    else:
+        header = first_line.rstrip()[1:]
+    # go through each line
+    for line in o:
+        if line.startswith(">"):
+            result[header] = temp_sequence
+            header = line.rstrip()[1:]
+            temp_sequence = ""
+        else:
+            temp_sequence = temp_sequence+line.rstrip()
+
+    # we write the last line
+    result[header] = temp_sequence
+
+    o.close()
+
 # ------------------------------------------------------------------------------
 # Main function
 # ------------------------------------------------------------------------------
