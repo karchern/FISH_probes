@@ -13,6 +13,7 @@ def main():
     # load the input files
     sequences,taxonomy,sel_clade,\
       min_len,verbose,outfile = load_input.load_and_check_input()
+      
     # find probes
     predict_probes.predict_probes(sequences,\
                                   taxonomy,\
