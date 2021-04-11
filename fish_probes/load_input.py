@@ -35,7 +35,7 @@ def input_parser():
                         dest='outfile', help='Output file [stdout]')
 
     # Output file
-    parser.add_argument('-p', action='store', default=0.9,
+    parser.add_argument('-p', action='store', default=0.9, type = float,
                         dest='perc_seq', help='Minimum fraction of sequences that should contain the selected probe [0.9]')
 
     args = parser.parse_args()
