@@ -1,4 +1,5 @@
 import sys
+from fish_probes import log
 
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
@@ -11,6 +12,9 @@ def split_sequences(taxonomy,sel_clade,sequences):
             seq_sel_clade[seq] = sequences[seq]
         else:
             seq_other[seq] = sequences[seq]
+
+    log.print_message("Sequences belonging to the selected clade: "+str(len(seq_sel_clade))+".")
+    log.print_message("Sequences belonging to other clades: "+str(len(seq_other))+".\n")
     return seq_sel_clade, seq_other
 
 # ------------------------------------------------------------------------------
@@ -28,32 +32,86 @@ def find_kmers(string,k):
             f[kmer] = f.get(kmer, 0) + 1
     return f
 
-def find_conserved_regions(list_strings,k):
+def find_conserved_regions(seq_sel_clade,k,threshold):
     all_strings_kmers = dict()
-    for s in list_strings:
-        all_strings_kmers[s] = find_kmers(s,k)
+    for s in seq_sel_clade:
+        all_strings_kmers[s] = find_kmers(seq_sel_clade[s],k)
     # find all possible k-mers
     all_kmers = set()
     for s in all_strings_kmers:
         for kmer in all_strings_kmers[s]:
             all_kmers.add(kmer)
+    log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
     # now we count how many times it appear
     count_mers = dict()
     for kmer in list(all_kmers):
         count_mers[kmer] = 0
-    # now we add the counts
+    # now we add the counts per k-mer
     for s in all_strings_kmers:
         for kmer in all_strings_kmers[s]:
             count_mers[kmer] = count_mers[kmer] + 1
+    # we check which k-mers covers all sequences
+    n_seq = len(seq_sel_clade)
+    kmers_recall = dict() # this will be filled in by "check_uniqueness"
+    kmers_precision = dict()
+    list_identical = list()
+    for kmer in count_mers:
+        if count_mers[kmer] == n_seq:
+            list_identical.append(kmer) # used only to print
+        if count_mers[kmer] > n_seq*threshold:
+            kmers_recall[kmer] = count_mers[kmer]
+            kmers_precision[kmer] = 0
+
+    log.print_message("  (Identifed "+str(len(list_identical))+" "+str(k)+"-mers present in all sequences)")
+    log.print_message(str(len(kmers_precision))+" "+str(k)+"-mers will go to the next step.")
+    log.print_message("(only k-mers present in at least "+str(threshold*100)+"% of the sequences will be used).\n")
+
+    if len(kmers_precision) == 0:
+        log.print_warning("No k-mers passed the filter. Please increase the threshold")
     # return
-    return count_mers
+    return kmers_recall,kmers_precision
+
+
 
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
 # ------------------------------------------------------------------------------
-def check_uniqueness(all_conserved_position, seq_other, probe_len):
-    print("ok")
+def check_uniqueness(kmers_precision, seq_other, probe_len):
+    # we check if the kmers are covered by other sequences
+    other_sel_clades = dict()
+    for s in seq_other:
+        this_kmers = find_kmers(seq_other[s],probe_len)
+        for kmer in this_kmers:
+            if kmer in kmers_precision: # note that here we are still excluding the N's....maybe to improve
+                kmers_precision[kmer] = kmers_precision[kmer] + 1
+                if not kmer in other_sel_clades:
+                    other_sel_clades[kmer] = list()
+                other_sel_clades[kmer].append(s)
+    return other_sel_clades
 
+
+# ------------------------------------------------------------------------------
+# Order to show the probes
+# ------------------------------------------------------------------------------
+def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy):
+    # prepare lines to print
+    to_print = list()
+    for kmer in list(kmers_recall.keys()):
+        this_str = kmer+"\t"+str(kmers_recall[kmer])+"\t"
+        this_str = this_str+str(kmers_precision[kmer])+"\t"
+        if kmer in other_sel_clades:
+            this_str = this_str+",".join(other_sel_clades[kmer])
+        to_print.append(this_str+"\n")
+    return to_print
+
+
+# ------------------------------------------------------------------------------
+# Save/Print result
+# ------------------------------------------------------------------------------
+def save_result(sel_probes, outfile):
+    sys.stdout.write("probe\tn_covered_sequences\tn_covered_others\tothers\n")
+    for p in sel_probes:
+        sys.stdout.write(p)
 
 # ------------------------------------------------------------------------------
 # Main function
@@ -67,12 +125,24 @@ def check_uniqueness(all_conserved_position, seq_other, probe_len):
 #  - outfile, where to save the output. If None, then stdout
 def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile):
     # Zero, find sequences that belong to the selected clade
+    log.print_log("Identify sequences from the selected clade")
     seq_sel_clade, seq_other = split_sequences(taxonomy,sel_clade,sequences)
 
     # First, identify possible conserved regions
-    all_sel_kmers = find_conserved_regions(list(seq_sel_clade.values()),\
-                                                probe_len)
+    threshold = 0.9
+    log.print_log("Identify k-mers for the query clade")
+    kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,\
+                                                probe_len,threshold)
 
     # Second, check if identified regions are unique, compared to the other
-    # clades
-    check_uniqueness(all_sel_kmers,seq_other,probe_len)
+    # clades (~ evaluating precision)
+    log.print_log("Check if the identified k-mers are present in the other clades")
+    other_sel_clades = check_uniqueness(kmers_precision,seq_other,probe_len)
+
+    # Third, prioritize selected probes
+    log.print_log("Prioritize selected probes")
+    sel_probes = priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy)
+
+    # print/save to outfile
+    log.print_log("Save the result")
+    save_result(sel_probes, outfile)

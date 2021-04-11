@@ -129,6 +129,8 @@ def check_input(sequences,taxonomy,args):
             to_remove.append(seq)
     for r in to_remove:
         del taxonomy[r]
+    if len(to_remove) > 0:
+        log.print_message("Removed "+str(len(to_remove))+" taxonomy line(s) because no sequence was present.\n")
 
 # ------------------------------------------------------------------------------
 # Main function

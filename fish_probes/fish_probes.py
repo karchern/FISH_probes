@@ -10,7 +10,8 @@ except Exception as e:
 import time
 
 def main():
-    t0 = time.time()
+    log.print_message("Call: ")
+    log.print_message(" ".join(sys.argv)+"\n")
 
     # load the input files
     sequences,taxonomy,sel_clade,\

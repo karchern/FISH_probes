@@ -61,3 +61,7 @@ def print_error(text,error_number):
         sys.exit(error_number)
     else:
         sys.exit(1)
+
+def print_warning(text):
+    sys.stderr.write("   "+colour("Warning: ","magenta_bold")+colour(text,"magenta")+"\n")
+    sys.stderr.flush()
