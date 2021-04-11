@@ -18,7 +18,7 @@ def main():
     predict_probes.predict_probes(sequences,\
                                   taxonomy,\
                                   sel_clade,\
-                                  min_len,\
+                                  probe_len,\
                                   verbose,\
                                   outfile)
 

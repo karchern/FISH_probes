@@ -25,7 +25,7 @@ def input_parser():
                         dest='verbose', help='Verbose level: 1=error,'\
                         ' 2=warning, 3=message, 4+=debugging [3]')
 
-    # Minimum length of the probes that we identify
+    # Length of the probes that we identify
     parser.add_argument('-k', action='store', type=int, default=20,
                         dest='probe_len', help='Probe length [20]')
 
@@ -101,8 +101,8 @@ def check_input(sequences,taxonomy,args):
         sys.stderr.write("Verbose (-v) needs to be lower than 0.\n")
         sys.exit(1)
 
-    # check min length of the probe
-    if args.min_len < 1:
+    # check length of the probe
+    if args.probe_len < 1:
         sys.stderr.write("Probe length (-m) cannot be lower than 0.\n")
         sys.exit(1)
 
