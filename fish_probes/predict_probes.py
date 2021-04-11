@@ -103,7 +103,18 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
 def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,n_seq_clade):
     # find the order
     probe_order = list()
-    probe_order = list(kmers_recall.keys())
+    missing = list()
+    # best one: cover all sequences, and not in the other clade
+    for p in list(kmers_recall.keys()):
+        if kmers_recall[p]/n_seq_clade == 1:
+            if kmers_precision[p] == 0:
+                probe_order.append(p)
+            else:
+                missing.append(p)
+        else:
+            missing.append(p)
+    probe_order.extend(missing)
+
     # prepare lines to print
     to_print = list()
     for kmer in probe_order:
