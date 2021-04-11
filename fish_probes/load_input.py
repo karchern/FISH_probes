@@ -1,5 +1,6 @@
 import sys
 import argparse
+from fish_probes import log
 
 # ------------------------------------------------------------------------------
 # Function to parse the input
@@ -34,6 +35,11 @@ def input_parser():
                         dest='outfile', help='Output file [stdout]')
 
     args = parser.parse_args()
+
+    # check args verbose
+    if args.verbose < 1:
+        log.print_error("Verbose (-v) needs to be higher than 0",2)
+
     return args
 
 
@@ -44,16 +50,14 @@ def load_sequences(sequences_file):
     try:
         o = open(sequences_file,"r")
     except:
-        sys.stderr.write("Cannot load the fasta file with the sequences.\n")
-        sys.exit(1)
+        log.print_error("Cannot load the fasta file with the sequences",3)
 
     # save result to a dict
     result = dict()
     # load file assuming is a fasta file
     first_line = o.readline()
     if not(first_line.startswith(">")):
-        sys.stderr.write("Error, not a fasta file.\n")
-        sys.exit(1)
+        log.print_error("Not a fasta file",4)
     else:
         header = first_line.rstrip()[1:]
         temp_sequence = ""
@@ -70,6 +74,8 @@ def load_sequences(sequences_file):
     result[header] = temp_sequence
 
     o.close()
+
+    log.print_message("Found "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
@@ -79,8 +85,7 @@ def load_taxonomy(taxonomy_file):
     try:
         o = open(taxonomy_file,"r")
     except:
-        sys.stderr.write("Cannot load the taxonomy file.\n")
-        sys.exit(1)
+        log.print_error("Cannot load the taxonomy file",5)
 
     # save result to a dict
     result = dict()
@@ -90,21 +95,17 @@ def load_taxonomy(taxonomy_file):
         result[vals[0]] = vals[1]
 
     o.close()
+
+    log.print_message("Found taxonomy information for "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
 # Function to check that the input is correct
 # ------------------------------------------------------------------------------
 def check_input(sequences,taxonomy,args):
-    # check args verbose
-    if args.verbose < 1:
-        sys.stderr.write("Verbose (-v) needs to be lower than 0.\n")
-        sys.exit(1)
-
     # check length of the probe
     if args.probe_len < 1:
-        sys.stderr.write("Probe length (-m) cannot be lower than 0.\n")
-        sys.exit(1)
+        log.print_error("Probe length (-m) cannot be lower than 0",6)
 
     # check that the clade is in the taxonomy
     found_clade = False
@@ -112,16 +113,14 @@ def check_input(sequences,taxonomy,args):
         if args.sel_clade in taxonomy[seq].split(";"):
             found_clade = True
     if not found_clade:
-        sys.stderr.write("Selected clade is not present in the taxonomy.\n")
-        sys.exit(1)
+        log.print_error("Selected clade is not present in the taxonomy",7)
 
     # check that we have a taxonomy annotation for each sequence
     # NOTE: it can be that there are more taxonomy entries than sequences, but
     # not the contrary
     for seq in sequences:
         if not seq in taxonomy:
-            sys.stderr.write("Sequence '"+seq+"' does not have a taxonomy.\n")
-            sys.exit(1)
+            log.print_error("Sequence '"+seq+"' does not have a taxonomy",8)
 
     # Remove entries from the taxonomy, if there are no corresponding sequences
     to_remove = list()
@@ -144,10 +143,13 @@ def load_and_check_input():
     args = input_parser()
 
     # load data from files
+    log.print_log("Load sequences")
     sequences = load_sequences(args.sequences)
+    log.print_log("Load taxonomy")
     taxonomy = load_taxonomy(args.taxonomy)
 
     # check that the input is correct
+    log.print_log("Check input files")
     check_input(sequences,taxonomy,args)
 
     return sequences,taxonomy,args.sel_clade,args.probe_len,args.verbose,\

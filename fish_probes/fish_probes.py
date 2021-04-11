@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import sys
 try:
-    from fish_probes import load_input, predict_probes
-except ImportError:
-    sys.exit("CRITICAL ERROR: Unable to find the util python package.")
+    from fish_probes import load_input, predict_probes, log
+except Exception as e:
+    sys.stderr.write("Error 1: Unable to load the python packages. Message:\n")
+    sys.stderr.write(str(e)+"\n")
+    sys.exit(1)
 
 import time
 
@@ -22,7 +24,7 @@ def main():
                                   verbose,\
                                   outfile)
 
-    sys.stderr.write('Elapsed time: {} s\n'.format( (time.time()-t0) ) )
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()
