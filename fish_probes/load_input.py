@@ -26,8 +26,8 @@ def input_parser():
                         ' 2=warning, 3=message, 4+=debugging [3]')
 
     # Minimum length of the probes that we identify
-    parser.add_argument('-m', action='store', type=int, default=20,
-                        dest='min_len', help='Minimum probe length [20]')
+    parser.add_argument('-k', action='store', type=int, default=20,
+                        dest='probe_len', help='Probe length [20]')
 
     # Output file
     parser.add_argument('-o', action='store', default=None,
@@ -150,5 +150,5 @@ def load_and_check_input():
     # check that the input is correct
     check_input(sequences,taxonomy,args)
 
-    return sequences,taxonomy,args.sel_clade,args.min_len,args.verbose,\
+    return sequences,taxonomy,args.sel_clade,args.probe_len,args.verbose,\
              args.outfile
