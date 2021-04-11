@@ -24,18 +24,22 @@ def DnaCheck(sequence):
     return all(base.upper() in ('A', 'C', 'T', 'G', 'U') for base in sequence)
 
 def find_kmers(string,k):
-    f = {}
+    res = {}
+    res_N = {}
     for x in range(len(string)+1-k):
         kmer = string[x:x+k]
         # we select only if they contain nucleotide sequences
         if DnaCheck(kmer):
-            f[kmer] = f.get(kmer, 0) + 1
-    return f
+            res[kmer] = res.get(kmer, 0) + 1
+        else:
+            res_N[kmer] = res_N.get(kmer, 0) + 1
+    return res, res_N
 
 def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     all_strings_kmers = dict()
     for s in seq_sel_clade:
-        all_strings_kmers[s] = find_kmers(seq_sel_clade[s],k)
+        allK,allK_N = find_kmers(seq_sel_clade[s],k)
+        all_strings_kmers[s] = allK
     # find all possible k-mers
     all_kmers = set()
     for s in all_strings_kmers:
@@ -80,27 +84,31 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
     for s in seq_other:
-        this_kmers = find_kmers(seq_other[s],probe_len)
+        this_kmers,this_kmers_N = find_kmers(seq_other[s],probe_len)
         for kmer in this_kmers:
-            if kmer in kmers_precision: # note that here we are still excluding the N's....maybe to improve
+            if kmer in kmers_precision:
                 kmers_precision[kmer] = kmers_precision[kmer] + 1
                 if not kmer in other_sel_clades:
                     other_sel_clades[kmer] = list()
                 other_sel_clades[kmer].append(s)
+        # we need to evaluate the ones with an N or others
+        for kmer in this_kmers_N:
+            dummy = "TODO"
     return other_sel_clades
 
 
 # ------------------------------------------------------------------------------
 # Order to show the probes
 # ------------------------------------------------------------------------------
-def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy):
+def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,n_seq_clade):
     # find the order
     probe_order = list()
     probe_order = list(kmers_recall.keys())
     # prepare lines to print
     to_print = list()
     for kmer in probe_order:
-        this_str = kmer+"\t"+str(kmers_recall[kmer])+"\t"
+        this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
+        this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
         if kmer in other_sel_clades:
             this_str = this_str+",".join(other_sel_clades[kmer])
@@ -112,7 +120,7 @@ def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy):
 # Save/Print result
 # ------------------------------------------------------------------------------
 def save_result(sel_probes, outfile):
-    sys.stdout.write("probe\tn_covered_sequences\tn_covered_others\tothers\n")
+    sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tothers\n")
     for p in sel_probes:
         sys.stdout.write(p)
 
@@ -143,7 +151,7 @@ def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile,perc_s
 
     # Third, prioritize selected probes
     log.print_log("Prioritize selected probes")
-    sel_probes = priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy)
+    sel_probes = priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,len(seq_sel_clade))
 
     # print/save to outfile
     log.print_log("Save the result")
