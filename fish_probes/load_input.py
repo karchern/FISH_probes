@@ -34,11 +34,21 @@ def input_parser():
     parser.add_argument('-o', action='store', default=None,
                         dest='outfile', help='Output file [stdout]')
 
+    # Output file
+    parser.add_argument('-p', action='store', default=0.9,
+                        dest='perc_seq', help='Minimum fraction of sequences that should contain the selected probe [0.9]')
+
     args = parser.parse_args()
 
     # check args verbose
     if args.verbose < 1:
         log.print_error("Verbose (-v) needs to be higher than 0",2)
+    # check args verbose
+    if args.perc_seq < 0 and args.perc_seq > 1:
+        log.print_error("Threshold (-p) should be between 0 and 1",2)
+    # check length of the probe
+    if args.probe_len < 1:
+        log.print_error("Probe length (-m) cannot be lower than 0",6)
 
     return args
 
@@ -103,10 +113,6 @@ def load_taxonomy(taxonomy_file):
 # Function to check that the input is correct
 # ------------------------------------------------------------------------------
 def check_input(sequences,taxonomy,args):
-    # check length of the probe
-    if args.probe_len < 1:
-        log.print_error("Probe length (-m) cannot be lower than 0",6)
-
     # check that the clade is in the taxonomy
     found_clade = False
     for seq in taxonomy:
@@ -155,4 +161,4 @@ def load_and_check_input():
     check_input(sequences,taxonomy,args)
 
     return sequences,taxonomy,args.sel_clade,args.probe_len,args.verbose,\
-             args.outfile
+             args.outfile, args.perc_seq

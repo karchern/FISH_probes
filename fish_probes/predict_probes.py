@@ -32,7 +32,7 @@ def find_kmers(string,k):
             f[kmer] = f.get(kmer, 0) + 1
     return f
 
-def find_conserved_regions(seq_sel_clade,k,threshold):
+def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     all_strings_kmers = dict()
     for s in seq_sel_clade:
         all_strings_kmers[s] = find_kmers(seq_sel_clade[s],k)
@@ -58,16 +58,16 @@ def find_conserved_regions(seq_sel_clade,k,threshold):
     for kmer in count_mers:
         if count_mers[kmer] == n_seq:
             list_identical.append(kmer) # used only to print
-        if count_mers[kmer] > n_seq*threshold:
+        if count_mers[kmer] > n_seq*perc_seq_with_kmer:
             kmers_recall[kmer] = count_mers[kmer]
             kmers_precision[kmer] = 0
 
     log.print_message("  (Identifed "+str(len(list_identical))+" "+str(k)+"-mers present in all sequences)")
     log.print_message(str(len(kmers_precision))+" "+str(k)+"-mers will go to the next step.")
-    log.print_message("(only k-mers present in at least "+str(threshold*100)+"% of the sequences will be used).\n")
+    log.print_message("(only k-mers present in at least "+str(perc_seq_with_kmer*100)+"% of the sequences will be used).\n")
 
     if len(kmers_precision) == 0:
-        log.print_warning("No k-mers passed the filter. Please increase the threshold")
+        log.print_warning("No k-mers passed the filter. Please decrease the threshold in -p")
     # return
     return kmers_recall,kmers_precision
 
@@ -94,9 +94,12 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
 # Order to show the probes
 # ------------------------------------------------------------------------------
 def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy):
+    # find the order
+    probe_order = list()
+    probe_order = list(kmers_recall.keys())
     # prepare lines to print
     to_print = list()
-    for kmer in list(kmers_recall.keys()):
+    for kmer in probe_order:
         this_str = kmer+"\t"+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
         if kmer in other_sel_clades:
@@ -123,16 +126,15 @@ def save_result(sel_probes, outfile):
 #  - probe_len, length for the selected probe (positive integer)
 #  - verbose,
 #  - outfile, where to save the output. If None, then stdout
-def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile):
+def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile,perc_seq_with_kmer):
     # Zero, find sequences that belong to the selected clade
     log.print_log("Identify sequences from the selected clade")
     seq_sel_clade, seq_other = split_sequences(taxonomy,sel_clade,sequences)
 
     # First, identify possible conserved regions
-    threshold = 0.9
     log.print_log("Identify k-mers for the query clade")
     kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,\
-                                                probe_len,threshold)
+                                                probe_len,perc_seq_with_kmer)
 
     # Second, check if identified regions are unique, compared to the other
     # clades (~ evaluating precision)
