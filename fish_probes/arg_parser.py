@@ -46,10 +46,10 @@ def input_parser():
     if args.verbose < 1:
         log.print_error("Verbose (-v) needs to be higher than 0",2)
     # check args perc seq
-    if args.perc_seq < 0 and args.perc_seq > 1:
+    if args.perc_seq < 0 or args.perc_seq > 1:
         log.print_error("Threshold (-p) should be between 0 and 1",2)
     # check length of the probe
     if args.probe_len < 1:
-        log.print_error("Probe length (-m) cannot be lower than 0",6)
+        log.print_error("Probe length (-k) cannot be lower than 0")
 
     return args
