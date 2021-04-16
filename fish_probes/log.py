@@ -54,8 +54,8 @@ def print_message(text):
     sys.stderr.write("   "+colour(text,"green")+"\n")
     sys.stderr.flush()
 
-def print_error(text,error_number):
-    sys.stderr.write("   "+colour("Error "+str(error_number)+": ","red_bold")+colour(text,"red")+"\n")
+def print_error(text,error_number = 1):
+    sys.stderr.write("   "+colour("Error: ","red_bold")+colour(text,"red")+"\n")
     sys.stderr.flush()
     if error_number != 0:
         sys.exit(error_number)
