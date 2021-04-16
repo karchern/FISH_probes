@@ -7,8 +7,6 @@ except Exception as e:
     sys.stderr.write(str(e)+"\n")
     sys.exit(1)
 
-import time
-
 def main():
     log.print_message("Call: ")
     log.print_message(" ".join(sys.argv)+"\n")
