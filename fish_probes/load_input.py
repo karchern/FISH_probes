@@ -40,10 +40,12 @@ def input_parser():
 
     args = parser.parse_args()
 
+    ############################################################################
+    # CHECK ARGUMENTS
     # check args verbose
     if args.verbose < 1:
         log.print_error("Verbose (-v) needs to be higher than 0",2)
-    # check args verbose
+    # check args perc seq
     if args.perc_seq < 0 and args.perc_seq > 1:
         log.print_error("Threshold (-p) should be between 0 and 1",2)
     # check length of the probe
