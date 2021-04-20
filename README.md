@@ -30,3 +30,17 @@ You will need a fasta file with 16S sequences and relative taxonomy.
 
 Simple examples
 --------------
+
+Test the design pipeline:
+```
+fish_probes design -s test/seq.fa -t test/tax -c Firmicutes -k 7
+```
+
+It will use the sequences in `test/seq.fa` (taxonomy in `test/tax`) to identify probes of length `7` that are unique for `Firmicutes`.
+
+Find the properties of a specific probe:
+```
+fish_probes test_probe -i "AATGCATCGATC"
+```
+
+It will identify GC content, sequence entropy and melting temperature of the probe `AATGCATCGATC`.
