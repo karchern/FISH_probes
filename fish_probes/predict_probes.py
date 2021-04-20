@@ -134,9 +134,7 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision)
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
-        this_str = this_str+str(probe_util.gc_content(kmer))+"\t"
-        this_str = this_str+str(probe_util.sequence_entropy(kmer))+"\t"
-        this_str = this_str+str(probe_util.melting_temperature(kmer))
+        this_str = this_str+probe_util.create_to_print(kmer)
         to_print.append(this_str+"\n")
 
     sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")

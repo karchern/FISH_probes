@@ -13,3 +13,11 @@ def sequence_entropy(sequence):
 # find melting temperature
 def melting_temperature(sequence):
     return 0
+
+# add variables for printing
+def create_to_print(sequence):
+    this_str = ""
+    this_str = this_str+str(gc_content(sequence))+"\t"
+    this_str = this_str+str(sequence_entropy(sequence))+"\t"
+    this_str = this_str+str(melting_temperature(sequence))
+    return this_str
