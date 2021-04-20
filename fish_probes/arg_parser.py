@@ -66,10 +66,13 @@ def input_parser():
     if args.command == "design":
         # there are three mandatory input
         if args.sequences is None:
+            print_menus.design()
             log.print_error("Missing -s.")
         if args.taxonomy is None:
+            print_menus.design()
             log.print_error("Missing -t.")
         if args.sel_clade is None:
+            print_menus.design()
             log.print_error("Missing -c.")
 
     ############################################################################
@@ -77,9 +80,8 @@ def input_parser():
     if args.command == "test_probe":
         # there is only one mandatory input
         if args.input is None:
+            print_menus.test_probe()
             log.print_error("Missing -i.")
-
-
 
     return args
 
