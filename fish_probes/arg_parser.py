@@ -1,12 +1,12 @@
 import sys
 import argparse
-from fish_probes import log
+from fish_probes import log, print_menus
 
 # ------------------------------------------------------------------------------
 # Function to parse the input
 # ------------------------------------------------------------------------------
 def input_parser():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(usage=print_menus.main_message(), formatter_class=CapitalisedHelpFormatter,add_help=False)
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,
@@ -82,3 +82,11 @@ def input_parser():
 
 
     return args
+
+
+# class to print the main menu -------------------------------------------------
+class CapitalisedHelpFormatter(argparse.HelpFormatter):
+    def add_usage(self, usage, actions, groups, prefix=None):
+        if prefix is None:
+            prefix = ''
+        return super(CapitalisedHelpFormatter, self).add_usage(usage, actions, groups, prefix)
