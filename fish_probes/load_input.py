@@ -1,7 +1,6 @@
 import sys
 import argparse
 from fish_probes import log
-from fish_probes import arg_parser
 
 # ------------------------------------------------------------------------------
 # Function to load the fasta file with the sequences
@@ -96,10 +95,7 @@ def check_input(sequences,taxonomy,args):
 #  - parse the arguments
 #  - load the input from the files and check that it is correct
 #  - return the created objects
-def load_and_check_input():
-    # load sys.argv
-    args = arg_parser.input_parser()
-
+def load_and_check_input(args):
     # load data from files
     log.print_log("Load sequences")
     sequences = load_sequences(args.sequences)
