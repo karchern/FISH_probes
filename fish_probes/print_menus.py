@@ -14,7 +14,7 @@ Command:
    design       Identify suitable probes for a given clade
    test_probe   Test properties of a probe
 
-Type ish_probes <command> to print the help for a specific command
+Type fish_probes <command> to print the help for a specific command
         '''
     return str_msg
 
