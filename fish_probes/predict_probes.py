@@ -145,20 +145,19 @@ def save_result(sel_probes, outfile):
 #  - probe_len, length for the selected probe (positive integer)
 #  - verbose,
 #  - outfile, where to save the output. If None, then stdout
-def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile,perc_seq_with_kmer):
+def predict_probes(sequences,taxonomy,args):
     # Zero, find sequences that belong to the selected clade
     log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other = split_sequences(taxonomy,sel_clade,sequences)
+    seq_sel_clade, seq_other = split_sequences(taxonomy,args.sel_clade,sequences)
 
     # First, identify possible conserved regions
     log.print_log("Identify k-mers for the query clade")
-    kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,\
-                                                probe_len,perc_seq_with_kmer)
+    kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,args.probe_len,args.perc_seq)
 
     # Second, check if identified regions are unique, compared to the other
     # clades (~ evaluating precision)
     log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness(kmers_precision,seq_other,probe_len)
+    other_sel_clades = check_uniqueness(kmers_precision,seq_other,args.probe_len)
 
     # Third, prioritize selected probes
     log.print_log("Prioritize selected probes")
@@ -166,4 +165,4 @@ def predict_probes(sequences,taxonomy,sel_clade,probe_len,verbose,outfile,perc_s
 
     # print/save to outfile
     log.print_log("Save the result")
-    save_result(sel_probes, outfile)
+    save_result(sel_probes, args.outfile)

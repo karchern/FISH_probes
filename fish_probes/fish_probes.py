@@ -15,17 +15,9 @@ def main():
     log.print_message(" ".join(sys.argv)+"\n")
 
     # load the input files
-    sequences,taxonomy,sel_clade,probe_len,verbose,outfile,\
-      perc_seq_with_kmer = load_input.load_and_check_input(args)
-
+    sequences,taxonomy = load_input.load_and_check_input(args)
     # find probes
-    predict_probes.predict_probes(sequences,\
-                                  taxonomy,\
-                                  sel_clade,\
-                                  probe_len,\
-                                  verbose,\
-                                  outfile,\
-                                  perc_seq_with_kmer)
+    predict_probes.predict_probes(sequences,taxonomy,args)
 
     sys.exit(0)
 

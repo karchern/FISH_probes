@@ -106,5 +106,4 @@ def load_and_check_input(args):
     log.print_log("Check input files")
     check_input(sequences,taxonomy,args)
 
-    return sequences,taxonomy,args.sel_clade,args.probe_len,args.verbose,\
-             args.outfile, args.perc_seq
+    return sequences,taxonomy
