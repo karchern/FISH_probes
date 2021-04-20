@@ -8,6 +8,10 @@ from fish_probes import log
 def input_parser():
     parser = argparse.ArgumentParser()
 
+    # COMMAND
+    parser.add_argument('command', action="store", default=None,
+                        help='command',choices=['design','test_probe'])
+
     # File with the sequences in fasta format
     parser.add_argument('sequences', action="store", default=None,
                         help='File containing the sequences')
@@ -33,6 +37,10 @@ def input_parser():
     # Output file
     parser.add_argument('-o', action='store', default=None,
                         dest='outfile', help='Output file [stdout]')
+
+    # Output file
+    parser.add_argument('-i', action='store', default=None,
+                        dest='input', help='General input')
 
     # Output file
     parser.add_argument('-p', action='store', default=0.9, type = float,
