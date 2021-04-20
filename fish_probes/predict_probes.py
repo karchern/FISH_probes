@@ -1,5 +1,5 @@
 import sys
-from fish_probes import log
+from fish_probes import log, probe_util
 
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
@@ -81,6 +81,7 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
 # Starting from the conserved regions, check if they are unique
 # ------------------------------------------------------------------------------
 def check_uniqueness(kmers_precision, seq_other, probe_len):
+    n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
     for s in seq_other:
@@ -91,16 +92,20 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
                 if not kmer in other_sel_clades:
                     other_sel_clades[kmer] = list()
                 other_sel_clades[kmer].append(s)
+                n_matching_to_other = n_matching_to_other + 1
         # we need to evaluate the ones with an N or others
         for kmer in this_kmers_N:
             dummy = "TODO"
+
+    log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
     return other_sel_clades
 
 
 # ------------------------------------------------------------------------------
 # Order to show the probes
 # ------------------------------------------------------------------------------
-def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,n_seq_clade):
+def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
+    log.print_message("We order the probes by the number of wrong clades.")
     # find the order
     probe_order = list()
     missing = list()
@@ -113,26 +118,29 @@ def priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,n_s
                 missing.append(p)
         else:
             missing.append(p)
+    log.print_message(str(len(probe_order))+" probe(s) present in all the selected clade(s) and have no contamination.\n")
     probe_order.extend(missing)
 
+    return probe_order
+
+
+# ------------------------------------------------------------------------------
+# Save/Print result
+# ------------------------------------------------------------------------------
+def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision):
     # prepare lines to print
     to_print = list()
     for kmer in probe_order:
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
-        if kmer in other_sel_clades:
-            this_str = this_str+",".join(other_sel_clades[kmer])
+        this_str = this_str+str(probe_util.gc_content(kmer))+"\t"
+        this_str = this_str+str(probe_util.sequence_entropy(kmer))+"\t"
+        this_str = this_str+str(probe_util.melting_temperature(kmer))
         to_print.append(this_str+"\n")
-    return to_print
 
-
-# ------------------------------------------------------------------------------
-# Save/Print result
-# ------------------------------------------------------------------------------
-def save_result(sel_probes, outfile):
-    sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tothers\n")
-    for p in sel_probes:
+    sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")
+    for p in to_print:
         sys.stdout.write(p)
 
 # ------------------------------------------------------------------------------
@@ -161,8 +169,8 @@ def predict_probes(sequences,taxonomy,args):
 
     # Third, prioritize selected probes
     log.print_log("Prioritize selected probes")
-    sel_probes = priotitize_probes(kmers_recall,kmers_precision,other_sel_clades,taxonomy,len(seq_sel_clade))
+    probe_order = priotitize_probes(kmers_recall,kmers_precision,len(seq_sel_clade))
 
     # print/save to outfile
     log.print_log("Save the result")
-    save_result(sel_probes, args.outfile)
+    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision)
