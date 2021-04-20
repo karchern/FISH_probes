@@ -22,7 +22,7 @@ git clone https://github.com/AlessioMilanese/FISH_probes.git
 Setup:
 ```
 cd FISH_probes
-python setup.py bdist_wheel
+python setup.py develop
 pip install --no-deps --force-reinstall dist/*.whl
 ```
 
