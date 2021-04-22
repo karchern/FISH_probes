@@ -6,7 +6,7 @@ from fish_probes import UTIL_log, UTIL_print_menus
 # Function to parse the input
 # ------------------------------------------------------------------------------
 def input_parser(tool_version):
-    parser = argparse.ArgumentParser(usage=UTIL_print_menus.main_message(), formatter_class=CapitalisedHelpFormatter,add_help=False)
+    parser = argparse.ArgumentParser(usage=UTIL_print_menus.main_message(tool_version), formatter_class=CapitalisedHelpFormatter,add_help=False)
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,

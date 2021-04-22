@@ -4,13 +4,16 @@ from fish_probes import UTIL_log
 # ------------------------------------------------------------------------------
 # main menu
 # ------------------------------------------------------------------------------
-def main_message(name=None):
+def main_message(tool_version):
     str_msg = '''
 \00
 '''
     # HEADER -------------------------------------------------------------------
     str_msg = str_msg+UTIL_log.colour("Program: ", "cyan")
     str_msg = str_msg+"fish_probes - a tool to design FISH probes for 16S sequences\n"
+
+    str_msg = str_msg+UTIL_log.colour("Version: ", "cyan")
+    str_msg = str_msg+str(tool_version)+"\n"
 
     str_msg = str_msg+UTIL_log.colour("Usage: ", "cyan")
     str_msg = str_msg+"fish_probes <command> [options]\n\n"
@@ -21,8 +24,8 @@ def main_message(name=None):
     str_msg = str_msg+UTIL_log.colour("   design       ", "green_bold")
     str_msg = str_msg+"Identify suitable probes for a given clade\n"
 
-    str_msg = str_msg+UTIL_log.colour("   test_probe   ", "green_bold")
-    str_msg = str_msg+"Test properties of a probe\n"
+    str_msg = str_msg+UTIL_log.colour("   check_probe  ", "green_bold")
+    str_msg = str_msg+"Check physical properties of a probe\n"
 
     # CONCLUDING ---------------------------------------------------------------
     str_msg = str_msg+"\nType fish_probes <command> to print the help for a specific command"
