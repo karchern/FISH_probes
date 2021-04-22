@@ -74,7 +74,7 @@ def design():
     sys.stderr.write(log.colour(" [stdout]\n", "magenta"))
 
     sys.stderr.write(log.colour("   -p  ","blue"))
-    sys.stderr.write("FLOAT    ")
+    sys.stderr.write("FLOAT   ")
     sys.stderr.write("minimum fraction of sequences that should contain the selected probe")
     sys.stderr.write(log.colour(" [0.9]\n", "magenta"))
 
@@ -99,7 +99,7 @@ def test_probe():
 
     # PARAMETERS ---------------------------------------------------------------
     sys.stderr.write(log.colour("   -i  ","blue"))
-    sys.stderr.write("STR    ")
+    sys.stderr.write("STR     ")
     sys.stderr.write("probe to test")
     sys.stderr.write(log.colour("\n", "magenta"))
 
