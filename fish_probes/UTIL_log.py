@@ -60,13 +60,14 @@ def print_message(text):
     sys.stderr.write("   "+colour(text,"green")+"\n")
     sys.stderr.flush()
 
-def print_error(text,error_number = 1):
+def print_error(text, error_number = 1, exit = True):
     sys.stderr.write("   "+colour("Error: ","red_bold")+colour(text,"red")+"\n")
     sys.stderr.flush()
-    if error_number != 0:
-        sys.exit(error_number)
-    else:
-        sys.exit(1)
+    if exit:
+        if error_number != 0:
+            sys.exit(error_number)
+        else:
+            sys.exit(1)
 
 def print_warning(text):
     sys.stderr.write("   "+colour("Warning: ","magenta_bold")+colour(text,"magenta")+"\n")

@@ -1,5 +1,5 @@
 import sys
-from fish_probes import UTIL_log, UTIL_probe
+from fish_probes import UTIL_log, UTIL_probe, UTIL_general
 
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
@@ -130,6 +130,8 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
 def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision):
     # prepare lines to print
     to_print = list()
+    to_print.append("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")
+
     for kmer in probe_order:
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
@@ -137,9 +139,7 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision)
         this_str = this_str+UTIL_probe.create_to_print(kmer)
         to_print.append(this_str+"\n")
 
-    sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")
-    for p in to_print:
-        sys.stdout.write(p)
+    UTIL_general.save_file(to_print,outfile)
 
 # ------------------------------------------------------------------------------
 # Main function
