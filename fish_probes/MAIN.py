@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import sys
 try:
+    # import UTIL
     from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe
+    # import commands files
     from fish_probes import C_load_input, C_predict_probes
 except Exception as e:
     sys.stderr.write("Error 1: Unable to load the python packages. Message:\n")
