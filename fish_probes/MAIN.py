@@ -2,7 +2,7 @@
 import sys
 try:
     # import UTIL
-    from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe, TEST
+    from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe, C_test
     # import commands files
     from fish_probes import C_load_input, C_predict_probes
     # import version
@@ -31,7 +31,7 @@ def main():
 
     # test the tool ------------------------------------------------------------
     if args.command == "test":
-        TEST.test()
+        C_test.test()
 
     sys.exit(0)
 
