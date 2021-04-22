@@ -2,6 +2,8 @@ import sys
 import argparse
 from fish_probes import UTIL_log
 
+VERBOSE = 1
+
 # ------------------------------------------------------------------------------
 # Function to load the fasta file with the sequences
 # ------------------------------------------------------------------------------
@@ -34,7 +36,8 @@ def load_sequences(sequences_file):
 
     o.close()
 
-    UTIL_log.print_message("Found "+str(len(result))+" sequences.\n")
+    if VERBOSE > 2:
+        UTIL_log.print_message("Found "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
@@ -55,7 +58,8 @@ def load_taxonomy(taxonomy_file):
 
     o.close()
 
-    UTIL_log.print_message("Found taxonomy information for "+str(len(result))+" sequences.\n")
+    if VERBOSE > 2:
+        UTIL_log.print_message("Found taxonomy information for "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
@@ -85,7 +89,8 @@ def check_input(sequences,taxonomy,args):
     for r in to_remove:
         del taxonomy[r]
     if len(to_remove) > 0:
-        UTIL_log.print_message("Removed "+str(len(to_remove))+" taxonomy line(s) because no sequence was present.\n")
+        if VERBOSE > 2:
+            UTIL_log.print_message("Removed "+str(len(to_remove))+" taxonomy line(s) because no sequence was present.\n")
 
 # ------------------------------------------------------------------------------
 # Main function
@@ -96,14 +101,21 @@ def check_input(sequences,taxonomy,args):
 #  - load the input from the files and check that it is correct
 #  - return the created objects
 def load_and_check_input(args):
+    # set verbose
+    global VERBOSE
+    VERBOSE = args.verbose
+
     # load data from files
-    UTIL_log.print_log("Load sequences")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Load sequences")
     sequences = load_sequences(args.sequences)
-    UTIL_log.print_log("Load taxonomy")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Load taxonomy")
     taxonomy = load_taxonomy(args.taxonomy)
 
     # check that the input is correct
-    UTIL_log.print_log("Check input files")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Check input files")
     check_input(sequences,taxonomy,args)
 
     return sequences,taxonomy

@@ -16,8 +16,9 @@ def main():
     # load sys.argv
     args = UTIL_arg_parser.input_parser(tool_version)
 
-    UTIL_log.print_message("Call: ")
-    UTIL_log.print_message(" ".join(sys.argv)+"\n")
+    if args.verbose > 2:
+        UTIL_log.print_message("Call: ")
+        UTIL_log.print_message(" ".join(sys.argv)+"\n")
 
     # find probes --------------------------------------------------------------
     if args.command == "design":

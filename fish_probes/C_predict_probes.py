@@ -1,6 +1,8 @@
 import sys
 from fish_probes import UTIL_log, UTIL_probe, UTIL_general
 
+VERBOSE = 1
+
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
 # ------------------------------------------------------------------------------
@@ -13,8 +15,9 @@ def split_sequences(taxonomy,sel_clade,sequences):
         else:
             seq_other[seq] = sequences[seq]
 
-    UTIL_log.print_message("Sequences belonging to the selected clade: "+str(len(seq_sel_clade))+".")
-    UTIL_log.print_message("Sequences belonging to other clades: "+str(len(seq_other))+".\n")
+    if VERBOSE > 2:
+        UTIL_log.print_message("Sequences belonging to the selected clade: "+str(len(seq_sel_clade))+".")
+        UTIL_log.print_message("Sequences belonging to other clades: "+str(len(seq_other))+".\n")
     return seq_sel_clade, seq_other
 
 # ------------------------------------------------------------------------------
@@ -45,7 +48,9 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     for s in all_strings_kmers:
         for kmer in all_strings_kmers[s]:
             all_kmers.add(kmer)
-    UTIL_log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
+
+    if VERBOSE > 2:
+        UTIL_log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
     # now we count how many times it appear
     count_mers = dict()
     for kmer in list(all_kmers):
@@ -66,12 +71,14 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
             kmers_recall[kmer] = count_mers[kmer]
             kmers_precision[kmer] = 0
 
-    UTIL_log.print_message("  (Identifed "+str(len(list_identical))+" "+str(k)+"-mers present in all sequences)")
-    UTIL_log.print_message(str(len(kmers_precision))+" "+str(k)+"-mers will go to the next step.")
-    UTIL_log.print_message("(only k-mers present in at least "+str(perc_seq_with_kmer*100)+"% of the sequences will be used).\n")
+    if VERBOSE > 2:
+        UTIL_log.print_message("  (Identifed "+str(len(list_identical))+" "+str(k)+"-mers present in all sequences)")
+        UTIL_log.print_message(str(len(kmers_precision))+" "+str(k)+"-mers will go to the next step.")
+        UTIL_log.print_message("(only k-mers present in at least "+str(perc_seq_with_kmer*100)+"% of the sequences will be used).\n")
 
     if len(kmers_precision) == 0:
-        UTIL_log.print_warning("No k-mers passed the filter. Please decrease the threshold in -p")
+        if VERBOSE > 1:
+            UTIL_log.print_warning("No k-mers passed the filter. Please decrease the threshold in -p")
     # return
     return kmers_recall,kmers_precision
 
@@ -97,7 +104,8 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
         for kmer in this_kmers_N:
             dummy = "TODO"
 
-    UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
+    if VERBOSE > 2:
+        UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
     return other_sel_clades
 
 
@@ -105,7 +113,9 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
 # Order to show the probes
 # ------------------------------------------------------------------------------
 def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
-    UTIL_log.print_message("We order the probes by the number of wrong clades.")
+    if VERBOSE > 2:
+        UTIL_log.print_message("We order the probes by the number of wrong clades.")
+
     # find the order
     probe_order = list()
     missing = list()
@@ -118,7 +128,9 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
                 missing.append(p)
         else:
             missing.append(p)
-    UTIL_log.print_message(str(len(probe_order))+" probe(s) present in all the selected clade(s) and have no contamination.\n")
+
+    if VERBOSE > 2:
+        UTIL_log.print_message(str(len(probe_order))+" probe(s) present in all the selected clade(s) and have no contamination.\n")
     probe_order.extend(missing)
 
     return probe_order
@@ -152,23 +164,32 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision)
 #  - verbose,
 #  - outfile, where to save the output. If None, then stdout
 def predict_probes(sequences,taxonomy,args):
+    # set verbose
+    global VERBOSE
+    VERBOSE = args.verbose
+
     # Zero, find sequences that belong to the selected clade
-    UTIL_log.print_log("Identify sequences from the selected clade")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Identify sequences from the selected clade")
     seq_sel_clade, seq_other = split_sequences(taxonomy,args.sel_clade,sequences)
 
     # First, identify possible conserved regions
-    UTIL_log.print_log("Identify k-mers for the query clade")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Identify k-mers for the query clade")
     kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,args.probe_len,args.perc_seq)
 
     # Second, check if identified regions are unique, compared to the other
     # clades (~ evaluating precision)
-    UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
     other_sel_clades = check_uniqueness(kmers_precision,seq_other,args.probe_len)
 
     # Third, prioritize selected probes
-    UTIL_log.print_log("Prioritize selected probes")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Prioritize selected probes")
     probe_order = priotitize_probes(kmers_recall,kmers_precision,len(seq_sel_clade))
 
     # print/save to outfile
-    UTIL_log.print_log("Save the result")
+    if VERBOSE > 2:
+        UTIL_log.print_log("Save the result")
     save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision)
