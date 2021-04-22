@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import sys
 try:
-    from fish_probes import load_input, predict_probes, UTIL_log, UTIL_arg_parser, UTIL_probe
+    from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe
+    from fish_probes import C_load_input, C_predict_probes
 except Exception as e:
     sys.stderr.write("Error 1: Unable to load the python packages. Message:\n")
     sys.stderr.write(str(e)+"\n")
@@ -16,8 +17,8 @@ def main():
 
     # find probes --------------------------------------------------------------
     if args.command == "design":
-        sequences,taxonomy = load_input.load_and_check_input(args)
-        predict_probes.predict_probes(sequences,taxonomy,args)
+        sequences,taxonomy = C_load_input.load_and_check_input(args)
+        C_predict_probes.predict_probes(sequences,taxonomy,args)
 
     # test a given probe -------------------------------------------------------
     if args.command == "test_probe":
