@@ -1,5 +1,5 @@
 import sys
-
+from fish_probes import log
 
 # ------------------------------------------------------------------------------
 # main menu
@@ -7,15 +7,26 @@ import sys
 def main_message(name=None):
     str_msg = '''
 \00
-Program: fish_probes - a tool to design FISH probes for 16S sequences
-Usage: fish_probes <command> [options]
+'''
+    # HEADER -------------------------------------------------------------------
+    str_msg = str_msg+log.colour("Program: ", "bold_blue")
+    str_msg = str_msg+"fish_probes - a tool to design FISH probes for 16S sequences\n"
 
-Command:
-   design       Identify suitable probes for a given clade
-   test_probe   Test properties of a probe
+    str_msg = str_msg+log.colour("Usage: ", "bold_blue")
+    str_msg = str_msg+"fish_probes <command> [options]\n\n"
 
-Type fish_probes <command> to print the help for a specific command
-        '''
+    str_msg = str_msg+log.colour("Command:\n", "bold_blue")
+
+    # COMMANDS -----------------------------------------------------------------
+    str_msg = str_msg+log.colour("   design       ", "green_bold")
+    str_msg = str_msg+"Identify suitable probes for a given clade\n"
+
+    str_msg = str_msg+log.colour("   test_probe   ", "green_bold")
+    str_msg = str_msg+"Test properties of a probe\n"
+
+    # CONCLUDING ---------------------------------------------------------------
+    str_msg = str_msg+"\nType fish_probes <command> to print the help for a specific command"
+
     return str_msg
 
 

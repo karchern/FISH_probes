@@ -8,6 +8,7 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 MAGENTA = '\033[35m'
 YELLOW = '\033[93m'
+BLUE = "\033[94m"
 DIM = '\033[2m'
 
 
@@ -25,6 +26,8 @@ def colour(text, text_colour):
         coloured_text = GREEN
     elif 'yellow' in text_colour:
         coloured_text = YELLOW
+    elif 'blue' in text_colour:
+        coloured_text = BLUE
     elif 'magenta' in text_colour:
         coloured_text = MAGENTA
     elif 'dim' in text_colour:
