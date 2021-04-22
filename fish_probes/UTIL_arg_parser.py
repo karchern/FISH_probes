@@ -10,7 +10,7 @@ def input_parser(tool_version):
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,
-                        help='command',choices=['design','test_probe','test'])
+                        help='command',choices=['design','check_probe','test'])
 
     # File with the sequences in fasta format
     parser.add_argument('-s', dest = 'sequences', action="store", default=None,
@@ -80,7 +80,7 @@ def input_parser(tool_version):
 
     ############################################################################
     # CHECK ARGUMENTS FOR COMMAND TEST_PROBE
-    if args.command == "test_probe":
+    if args.command == "check_probe":
         # there is only one mandatory input
         if args.input is None:
             UTIL_print_menus.test_probe()

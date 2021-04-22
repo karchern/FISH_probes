@@ -25,8 +25,12 @@ def main():
         C_predict_probes.predict_probes(sequences,taxonomy,args)
 
     # test a given probe -------------------------------------------------------
-    if args.command == "test_probe":
+    if args.command == "check_probe":
         print(UTIL_probe.create_to_print(args.input,header = True))
+
+    # test the tool ------------------------------------------------------------
+    if args.command == "test":
+        print("Test")
 
     sys.exit(0)
 
