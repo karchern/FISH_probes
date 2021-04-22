@@ -11,7 +11,7 @@ def load_sequences(sequences_file):
     try:
         o = open(sequences_file,"r")
     except:
-        UTIL_log.print_error("Cannot load the fasta file with the sequences",3)
+        UTIL_log.print_error("Cannot load the fasta file with the sequences")
 
     # save result to a dict
     result = dict()
