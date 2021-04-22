@@ -1,12 +1,12 @@
 import sys
 import argparse
-from fish_probes import UTIL_log, print_menus
+from fish_probes import UTIL_log, UTIL_print_menus
 
 # ------------------------------------------------------------------------------
 # Function to parse the input
 # ------------------------------------------------------------------------------
 def input_parser():
-    parser = argparse.ArgumentParser(usage=print_menus.main_message(), formatter_class=CapitalisedHelpFormatter,add_help=False)
+    parser = argparse.ArgumentParser(usage=UTIL_print_menus.main_message(), formatter_class=CapitalisedHelpFormatter,add_help=False)
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,
@@ -66,13 +66,13 @@ def input_parser():
     if args.command == "design":
         # there are three mandatory input
         if args.sequences is None:
-            print_menus.design()
+            UTIL_print_menus.design()
             UTIL_log.print_error("Missing -s.")
         if args.taxonomy is None:
-            print_menus.design()
+            UTIL_print_menus.design()
             UTIL_log.print_error("Missing -t.")
         if args.sel_clade is None:
-            print_menus.design()
+            UTIL_print_menus.design()
             UTIL_log.print_error("Missing -c.")
 
     ############################################################################
@@ -80,7 +80,7 @@ def input_parser():
     if args.command == "test_probe":
         # there is only one mandatory input
         if args.input is None:
-            print_menus.test_probe()
+            UTIL_print_menus.test_probe()
             UTIL_log.print_error("Missing -i.")
 
     return args
