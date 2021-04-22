@@ -1,5 +1,5 @@
 import sys
-from fish_probes import UTIL_log, probe_util
+from fish_probes import UTIL_log, UTIL_probe
 
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
@@ -134,7 +134,7 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision)
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
-        this_str = this_str+probe_util.create_to_print(kmer)
+        this_str = this_str+UTIL_probe.create_to_print(kmer)
         to_print.append(this_str+"\n")
 
     sys.stdout.write("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")

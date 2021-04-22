@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 try:
-    from fish_probes import load_input, predict_probes, UTIL_log, arg_parser, probe_util
+    from fish_probes import load_input, predict_probes, UTIL_log, arg_parser, UTIL_probe
 except Exception as e:
     sys.stderr.write("Error 1: Unable to load the python packages. Message:\n")
     sys.stderr.write(str(e)+"\n")
@@ -21,7 +21,7 @@ def main():
 
     # test a given probe -------------------------------------------------------
     if args.command == "test_probe":
-        print(probe_util.create_to_print(args.input,header = True))
+        print(UTIL_probe.create_to_print(args.input,header = True))
 
     sys.exit(0)
 
