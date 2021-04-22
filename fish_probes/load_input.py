@@ -1,6 +1,6 @@
 import sys
 import argparse
-from fish_probes import log
+from fish_probes import UTIL_log
 
 # ------------------------------------------------------------------------------
 # Function to load the fasta file with the sequences
@@ -9,14 +9,14 @@ def load_sequences(sequences_file):
     try:
         o = open(sequences_file,"r")
     except:
-        log.print_error("Cannot load the fasta file with the sequences",3)
+        UTIL_log.print_error("Cannot load the fasta file with the sequences",3)
 
     # save result to a dict
     result = dict()
     # load file assuming is a fasta file
     first_line = o.readline()
     if not(first_line.startswith(">")):
-        log.print_error("Not a fasta file",4)
+        UTIL_log.print_error("Not a fasta file",4)
     else:
         header = first_line.rstrip()[1:]
         temp_sequence = ""
@@ -34,7 +34,7 @@ def load_sequences(sequences_file):
 
     o.close()
 
-    log.print_message("Found "+str(len(result))+" sequences.\n")
+    UTIL_log.print_message("Found "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ def load_taxonomy(taxonomy_file):
     try:
         o = open(taxonomy_file,"r")
     except:
-        log.print_error("Cannot load the taxonomy file",5)
+        UTIL_log.print_error("Cannot load the taxonomy file",5)
 
     # save result to a dict
     result = dict()
@@ -55,7 +55,7 @@ def load_taxonomy(taxonomy_file):
 
     o.close()
 
-    log.print_message("Found taxonomy information for "+str(len(result))+" sequences.\n")
+    UTIL_log.print_message("Found taxonomy information for "+str(len(result))+" sequences.\n")
     return result
 
 # ------------------------------------------------------------------------------
@@ -68,14 +68,14 @@ def check_input(sequences,taxonomy,args):
         if args.sel_clade in taxonomy[seq].split(";"):
             found_clade = True
     if not found_clade:
-        log.print_error("Selected clade is not present in the taxonomy",7)
+        UTIL_log.print_error("Selected clade is not present in the taxonomy",7)
 
     # check that we have a taxonomy annotation for each sequence
     # NOTE: it can be that there are more taxonomy entries than sequences, but
     # not the contrary
     for seq in sequences:
         if not seq in taxonomy:
-            log.print_error("Sequence '"+seq+"' does not have a taxonomy",8)
+            UTIL_log.print_error("Sequence '"+seq+"' does not have a taxonomy",8)
 
     # Remove entries from the taxonomy, if there are no corresponding sequences
     to_remove = list()
@@ -85,7 +85,7 @@ def check_input(sequences,taxonomy,args):
     for r in to_remove:
         del taxonomy[r]
     if len(to_remove) > 0:
-        log.print_message("Removed "+str(len(to_remove))+" taxonomy line(s) because no sequence was present.\n")
+        UTIL_log.print_message("Removed "+str(len(to_remove))+" taxonomy line(s) because no sequence was present.\n")
 
 # ------------------------------------------------------------------------------
 # Main function
@@ -97,13 +97,13 @@ def check_input(sequences,taxonomy,args):
 #  - return the created objects
 def load_and_check_input(args):
     # load data from files
-    log.print_log("Load sequences")
+    UTIL_log.print_log("Load sequences")
     sequences = load_sequences(args.sequences)
-    log.print_log("Load taxonomy")
+    UTIL_log.print_log("Load taxonomy")
     taxonomy = load_taxonomy(args.taxonomy)
 
     # check that the input is correct
-    log.print_log("Check input files")
+    UTIL_log.print_log("Check input files")
     check_input(sequences,taxonomy,args)
 
     return sequences,taxonomy

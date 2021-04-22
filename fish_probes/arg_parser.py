@@ -1,6 +1,6 @@
 import sys
 import argparse
-from fish_probes import log, print_menus
+from fish_probes import UTIL_log, print_menus
 
 # ------------------------------------------------------------------------------
 # Function to parse the input
@@ -52,13 +52,13 @@ def input_parser():
     # CHECK ARGUMENTS
     # check args verbose
     if args.verbose < 1:
-        log.print_error("Verbose (-v) needs to be higher than 0")
+        UTIL_log.print_error("Verbose (-v) needs to be higher than 0")
     # check args perc seq
     if args.perc_seq < 0 or args.perc_seq > 1:
-        log.print_error("Threshold (-p) should be between 0 and 1")
+        UTIL_log.print_error("Threshold (-p) should be between 0 and 1")
     # check length of the probe
     if args.probe_len < 1:
-        log.print_error("Probe length (-k) cannot be lower than 0")
+        UTIL_log.print_error("Probe length (-k) cannot be lower than 0")
 
 
     ############################################################################
@@ -67,13 +67,13 @@ def input_parser():
         # there are three mandatory input
         if args.sequences is None:
             print_menus.design()
-            log.print_error("Missing -s.")
+            UTIL_log.print_error("Missing -s.")
         if args.taxonomy is None:
             print_menus.design()
-            log.print_error("Missing -t.")
+            UTIL_log.print_error("Missing -t.")
         if args.sel_clade is None:
             print_menus.design()
-            log.print_error("Missing -c.")
+            UTIL_log.print_error("Missing -c.")
 
     ############################################################################
     # CHECK ARGUMENTS FOR COMMAND TEST_PROBE
@@ -81,7 +81,7 @@ def input_parser():
         # there is only one mandatory input
         if args.input is None:
             print_menus.test_probe()
-            log.print_error("Missing -i.")
+            UTIL_log.print_error("Missing -i.")
 
     return args
 
