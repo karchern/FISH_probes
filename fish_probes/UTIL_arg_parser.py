@@ -5,7 +5,7 @@ from fish_probes import UTIL_log, UTIL_print_menus
 # ------------------------------------------------------------------------------
 # Function to parse the input
 # ------------------------------------------------------------------------------
-def input_parser():
+def input_parser(tool_version):
     parser = argparse.ArgumentParser(usage=UTIL_print_menus.main_message(), formatter_class=CapitalisedHelpFormatter,add_help=False)
 
     # COMMAND
@@ -38,13 +38,16 @@ def input_parser():
     parser.add_argument('-o', action='store', default=None,
                         dest='outfile', help='Output file [stdout]')
 
-    # Output file
+    # General input file
     parser.add_argument('-i', action='store', default=None,
                         dest='input', help='General input')
 
-    # Output file
+    # Min fraction of sequences from the selected clade
     parser.add_argument('-p', action='store', default=0.9, type = float,
                         dest='perc_seq', help='Minimum fraction of sequences that should contain the selected probe [0.9]')
+
+    # version
+    parser.add_argument('--version', action='version', version='%(prog)s {0} on python {1}'.format(tool_version, sys.version.split()[0]))
 
     args = parser.parse_args()
 

@@ -5,6 +5,8 @@ try:
     from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe
     # import commands files
     from fish_probes import C_load_input, C_predict_probes
+    # import version
+    from . import __version__ as tool_version
 except Exception as e:
     sys.stderr.write("Error 1: Unable to load the python packages. Message:\n")
     sys.stderr.write(str(e)+"\n")
@@ -12,7 +14,7 @@ except Exception as e:
 
 def main():
     # load sys.argv
-    args = UTIL_arg_parser.input_parser()
+    args = UTIL_arg_parser.input_parser(tool_version)
 
     UTIL_log.print_message("Call: ")
     UTIL_log.print_message(" ".join(sys.argv)+"\n")
