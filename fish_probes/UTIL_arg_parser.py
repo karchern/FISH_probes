@@ -10,7 +10,7 @@ def input_parser(tool_version):
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,
-                        help='command',choices=['design','test_probe'])
+                        help='command',choices=['design','test_probe','test'])
 
     # File with the sequences in fasta format
     parser.add_argument('-s', dest = 'sequences', action="store", default=None,

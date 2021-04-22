@@ -27,6 +27,9 @@ def main_message(tool_version):
     str_msg = str_msg+UTIL_log.colour("   check_probe  ", "green_bold")
     str_msg = str_msg+"Check physical properties of a probe\n"
 
+    str_msg = str_msg+UTIL_log.colour("   test         ", "green_bold")
+    str_msg = str_msg+"Test the tool\n"
+
     # CONCLUDING ---------------------------------------------------------------
     str_msg = str_msg+"\nType fish_probes <command> to print the help for a specific command"
 
