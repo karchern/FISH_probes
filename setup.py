@@ -9,7 +9,11 @@ setup(
     version=version_init,
     author='Alessio Milanese',
     author_email='milanese.alessio@gmail.com',
-    packages=find_packages(exclude=["test"]),
+    # we add the test files
+    package_data={
+        "fish_probes.test": ["seq.fa", "tax"]
+    },
+    # entry point
     entry_points={
         'console_scripts': [
             'fish_probes = fish_probes.MAIN:main',
