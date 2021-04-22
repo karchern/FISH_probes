@@ -9,13 +9,13 @@ def main_message(name=None):
 \00
 '''
     # HEADER -------------------------------------------------------------------
-    str_msg = str_msg+log.colour("Program: ", "bold_blue")
+    str_msg = str_msg+log.colour("Program: ", "cyan")
     str_msg = str_msg+"fish_probes - a tool to design FISH probes for 16S sequences\n"
 
-    str_msg = str_msg+log.colour("Usage: ", "bold_blue")
+    str_msg = str_msg+log.colour("Usage: ", "cyan")
     str_msg = str_msg+"fish_probes <command> [options]\n\n"
 
-    str_msg = str_msg+log.colour("Command:\n", "bold_blue")
+    str_msg = str_msg+log.colour("Command:\n", "cyan")
 
     # COMMANDS -----------------------------------------------------------------
     str_msg = str_msg+log.colour("   design       ", "green_bold")
