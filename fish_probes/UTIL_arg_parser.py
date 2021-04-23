@@ -46,6 +46,10 @@ def input_parser(tool_version):
     parser.add_argument('-p', action='store', default=0.9, type = float,
                         dest='perc_seq', help='Minimum fraction of sequences that should contain the selected probe [0.9]')
 
+    # help
+    parser.add_argument('-h','--help', action='store_true', default=False,
+                        dest='help', help='Print help]')
+
     # version
     parser.add_argument('--version', action='version', version='%(prog)s {0} on python {1}'.format(tool_version, sys.version.split()[0]))
 
@@ -67,6 +71,10 @@ def input_parser(tool_version):
     ############################################################################
     # CHECK ARGUMENTS FOR COMMAND DESIGN
     if args.command == "design":
+        # print help
+        if args.help:
+            UTIL_print_menus.design()
+            sys.exit(0)
         # there are three mandatory input
         if args.sequences is None:
             UTIL_print_menus.design()
@@ -81,6 +89,10 @@ def input_parser(tool_version):
     ############################################################################
     # CHECK ARGUMENTS FOR COMMAND TEST_PROBE
     if args.command == "check_probe":
+        # print help
+        if args.help:
+            UTIL_print_menus.test_probe()
+            sys.exit(0)
         # there is only one mandatory input
         if args.input is None:
             UTIL_print_menus.test_probe()
