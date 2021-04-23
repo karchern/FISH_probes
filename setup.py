@@ -19,5 +19,6 @@ setup(
         'console_scripts': [
             'fish_probes = fish_probes.MAIN:main',
         ]
-    }
+    },
+    include_package_data=True,
 )
