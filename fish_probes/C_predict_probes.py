@@ -142,7 +142,7 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
 def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision):
     # prepare lines to print
     to_print = list()
-    to_print.append("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\n")
+    to_print.append("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\tprobe_accessibility\n")
 
     for kmer in probe_order:
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
