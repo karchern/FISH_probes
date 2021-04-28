@@ -66,7 +66,7 @@ def design():
 
     sys.stderr.write(UTIL_log.colour("   -c  ","blue"))
     sys.stderr.write("STR     ")
-    sys.stderr.write("clade for which we need to find the probe")
+    sys.stderr.write("clade for which we need to find the probe (if more than one, separate with spaces)")
     sys.stderr.write(UTIL_log.colour("\n", "magenta"))
 
     sys.stderr.write(UTIL_log.colour("   -k  ","blue"))

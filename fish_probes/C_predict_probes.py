@@ -10,7 +10,14 @@ def split_sequences(taxonomy,sel_clade,sequences):
     seq_sel_clade = dict()
     seq_other = dict()
     for seq in taxonomy:
-        if sel_clade in taxonomy[seq].split(";"):
+        # we check if any of the selected clades is present
+        to_be_added = False
+        for s_c in sel_clade:
+            if s_c in taxonomy[seq].split(";"):
+                to_be_added = True
+
+        # we add it to the correct
+        if to_be_added :
             seq_sel_clade[seq] = sequences[seq]
         else:
             seq_other[seq] = sequences[seq]

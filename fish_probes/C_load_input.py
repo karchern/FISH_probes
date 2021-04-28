@@ -69,17 +69,19 @@ def check_input(sequences,taxonomy,args):
     # check that the clade is in the taxonomy
     found_clade = False
     for seq in taxonomy:
-        if args.sel_clade in taxonomy[seq].split(";"):
-            found_clade = True
+        for clade in args.sel_clade:
+            if clade in taxonomy[seq].split(";"):
+                found_clade = True
     if not found_clade:
-        UTIL_log.print_error("Selected clade is not present in the taxonomy",7)
+        # none of the clades in the list is present
+        UTIL_log.print_error("Selected clade(s) not present in the taxonomy")
 
     # check that we have a taxonomy annotation for each sequence
     # NOTE: it can be that there are more taxonomy entries than sequences, but
     # not the contrary
     for seq in sequences:
         if not seq in taxonomy:
-            UTIL_log.print_error("Sequence '"+seq+"' does not have a taxonomy",8)
+            UTIL_log.print_error("Sequence '"+seq+"' does not have a taxonomy")
 
     # Remove entries from the taxonomy, if there are no corresponding sequences
     to_remove = list()

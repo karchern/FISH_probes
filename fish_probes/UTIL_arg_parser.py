@@ -23,7 +23,7 @@ def input_parser(tool_version):
 
     # Clade for which we have to find the primers
     parser.add_argument('-c', dest = 'sel_clade', action="store", default=None,
-                        help='Clade selected to design the primers')
+                        help='Clade selected to design the primers',nargs="+")
 
     # Verbose level
     parser.add_argument('-v', action='store', type=int, default=3,
