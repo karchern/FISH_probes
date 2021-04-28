@@ -27,7 +27,7 @@ def main():
 
     # test a given probe -------------------------------------------------------
     if args.command == "check_probe":
-        print(UTIL_probe.create_to_print(args.input,header = True))
+        print(UTIL_probe.create_to_print(args.input,header = True,split = args.split_probe))
 
     # test the tool ------------------------------------------------------------
     if args.command == "test":

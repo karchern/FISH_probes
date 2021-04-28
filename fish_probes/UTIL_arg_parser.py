@@ -48,7 +48,11 @@ def input_parser(tool_version):
 
     # help
     parser.add_argument('-h','--help', action='store_true', default=False,
-                        dest='help', help='Print help]')
+                        dest='help', help='Print help')
+
+    # help
+    parser.add_argument('-sp','--split', action='store_true', default=False,
+                        dest='split_probe', help='Evaluate also a probe split in two')
 
     # version
     parser.add_argument('--version', action='version', version='%(prog)s {0} on python {1}'.format(tool_version, sys.version.split()[0]))

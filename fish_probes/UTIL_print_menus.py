@@ -109,6 +109,11 @@ def test_probe():
     sys.stderr.write("probe to test")
     sys.stderr.write(UTIL_log.colour("\n", "magenta"))
 
+    sys.stderr.write(UTIL_log.colour("   -sp ","blue"))
+    sys.stderr.write("        ")
+    sys.stderr.write("Evaluate also the two half of the probes alone")
+    sys.stderr.write(UTIL_log.colour("\n", "magenta"))
+
     sys.stderr.write(UTIL_log.colour("   -v  ","blue"))
     sys.stderr.write("INT     ")
     sys.stderr.write("verbose level: 1=error, 2=warning, 3=message, 4+=debugging")
