@@ -91,51 +91,19 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
 
 def get_kmer_sens(seq_sel_clade,kmer):
 
-    #all_strings_kmers = dict()
-    #for s in seq_sel_clade:
-    #   allK,allK_N = find_kmers(seq_sel_clade[s],len(kmer))
-    #   all_strings_kmers[s] = allK
-
-    all_kmers = set()
-    all_kmers.add(kmer)
-    #for s in all_strings_kmers:
-    #   for kmer in all_strings_kmers[s]:
-    #       all_kmers.add(kmer)
-
     if VERBOSE > 2:
         #UTIL_log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
         UTIL_log.print_message("Calculating sensitivity for k-mer {}".format(kmer))
-    # # now we count how many times it appear
-    count_mers = dict()
-    for kmer in list(all_kmers):
-        count_mers[kmer] = 0
-    # # now we add the counts per k-mer
-    #for _, kmers in all_strings_kmers.items():
-    for _, seq in seq_sel_clade.items():
-        if kmer in seq:
-            count_mers[kmer] = count_mers[kmer] + 1
-    # # we check which k-mers covers all sequences
-    n_seq = len(seq_sel_clade)
+
+    count_mers = sum([True if kmer in seq else False for _, seq in seq_sel_clade.items()])
+    
     kmers_recall = dict() # this will be filled in by "check_uniqueness"
     kmers_precision = dict()
-    list_identical = list()
-    for kmer in count_mers:
-        if count_mers[kmer] == n_seq:
-            list_identical.append(kmer) # used only to print
-        #if count_mers[kmer] > n_seq*perc_seq_with_kmer:
-        kmers_recall[kmer] = count_mers[kmer]
-        kmers_precision[kmer] = 0
+    
+    kmers_recall[kmer] = count_mers
+    kmers_precision[kmer] = 0
 
-    #if VERBOSE > 2:
-        #UTIL_log.print_message("  (Identifed "+str(len(list_identical))+" "+str(k)+"-mers present in all sequences)")
-        #UTIL_log.print_message(str(len(kmers_precision))+" "+str(k)+"-mers will go to the next step.")
-        #UTIL_log.print_message("(only k-mers present in at least "+str(perc_seq_with_kmer*100)+"% of the sequences will be used).\n")
-
-    # if len(kmers_precision) == 0:
-    #     if VERBOSE > 1:
-    #         UTIL_log.print_warning("No k-mers passed the filter. Please decrease the threshold in -p")
-    # return
-    return kmers_recall,kmers_precision
+    return kmers_recall, kmers_precision
 
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
