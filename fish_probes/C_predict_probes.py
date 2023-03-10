@@ -89,7 +89,7 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     # return
     return kmers_recall,kmers_precision
 
-def get_kmer_sens(seq_sel_clade,kmer):
+def get_kmer_sens(seq_sel_clade, kmer):
 
     if VERBOSE > 2:
         #UTIL_log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
@@ -133,16 +133,14 @@ def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    if len(kmers_precision.keys()) != 1:
+    if len(kmers_precision) != 1:
         asddassda
     # is only on...
     for kmer in kmers_precision.keys():
         for s, seq in seq_other.items():
             if kmer in seq:
-                kmers_precision[kmer] = kmers_precision[kmer] + 1
-                if not kmer in other_sel_clades:
-                    other_sel_clades[kmer] = list()
-                other_sel_clades[kmer].append(s)
+                kmers_precision[kmer] += 1
+                other_sel_clades.setdefault(kmer, []).append(s)
     return other_sel_clades
 
 
