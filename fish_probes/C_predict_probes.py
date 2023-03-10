@@ -89,7 +89,7 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     # return
     return kmers_recall,kmers_precision
 
-def get_kmer_sens(seq_sel_clade,kmer):
+def get_kmer_sens(seq_sel_clade, kmer):
 
     #all_strings_kmers = dict()
     #for s in seq_sel_clade:
