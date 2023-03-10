@@ -172,9 +172,7 @@ def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
         for s, seq in seq_other.items():
             if kmer in seq:
                 kmers_precision[kmer] += 1
-                if not kmer in other_sel_clades:
-                    other_sel_clades[kmer] = list()
-                other_sel_clades[kmer].append(s)
+                other_sel_clades.setdefault(kmer, []).append(s)
     return other_sel_clades
 
 
