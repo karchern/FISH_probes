@@ -165,7 +165,7 @@ def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    if len(kmers_precision.keys()) != 1:
+    if len(kmers_precision) != 1:
         asddassda
     # is only on...
     for kmer in kmers_precision.keys():
