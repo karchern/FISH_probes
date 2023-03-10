@@ -91,10 +91,10 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
 
 def get_kmer_sens(seq_sel_clade,kmer):
 
-    all_strings_kmers = dict()
-    for s in seq_sel_clade:
-       allK,allK_N = find_kmers(seq_sel_clade[s],len(kmer))
-       all_strings_kmers[s] = allK
+    #all_strings_kmers = dict()
+    #for s in seq_sel_clade:
+    #   allK,allK_N = find_kmers(seq_sel_clade[s],len(kmer))
+    #   all_strings_kmers[s] = allK
 
     all_kmers = set()
     all_kmers.add(kmer)
@@ -110,8 +110,9 @@ def get_kmer_sens(seq_sel_clade,kmer):
     for kmer in list(all_kmers):
         count_mers[kmer] = 0
     # # now we add the counts per k-mer
-    for _, kmers in all_strings_kmers.items():
-        if kmer in kmers.keys():
+    #for _, kmers in all_strings_kmers.items():
+    for _, seq in seq_sel_clade.items():
+        if kmer in seq:
             count_mers[kmer] = count_mers[kmer] + 1
     # # we check which k-mers covers all sequences
     n_seq = len(seq_sel_clade)
