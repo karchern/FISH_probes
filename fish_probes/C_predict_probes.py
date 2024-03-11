@@ -89,7 +89,21 @@ def find_conserved_regions(seq_sel_clade,k,perc_seq_with_kmer):
     # return
     return kmers_recall,kmers_precision
 
+def get_kmer_sens(seq_sel_clade, kmer):
 
+    if VERBOSE > 2:
+        #UTIL_log.print_message("Identifed "+str(len(all_kmers))+" unique "+str(k)+"-mers.")
+        UTIL_log.print_message("Calculating sensitivity for k-mer {}".format(kmer))
+
+    count_mers = sum([True if kmer in seq else False for _, seq in seq_sel_clade.items()])
+    
+    kmers_recall = dict() # this will be filled in by "check_uniqueness"
+    kmers_precision = dict()
+    
+    kmers_recall[kmer] = count_mers
+    kmers_precision[kmer] = 0
+
+    return kmers_recall, kmers_precision
 
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
@@ -113,6 +127,20 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
 
     if VERBOSE > 2:
         UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
+    return other_sel_clades
+
+def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
+    n_matching_to_other = 0
+    # we check if the kmers are covered by other sequences
+    other_sel_clades = dict()
+    if len(kmers_precision) != 1:
+        asddassda
+    # is only on...
+    for kmer in kmers_precision.keys():
+        for s, seq in seq_other.items():
+            if kmer in seq:
+                kmers_precision[kmer] += 1
+                other_sel_clades.setdefault(kmer, []).append(s)
     return other_sel_clades
 
 
@@ -200,3 +228,37 @@ def predict_probes(sequences,taxonomy,args):
     if VERBOSE > 2:
         UTIL_log.print_log("Save the result")
     save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision)
+
+
+# Main function (2)
+# ------------------------------------------------------------------------------
+# Input:
+#  - sequences, dictionary of seq_id -> nucleotide sequence
+#  - taxonomy, dictionary of seq_id -> "clade1;clade2;clade3"
+#  - sel_clade, clade for which we have to design the probe
+#  - probe_to_evaluate, specific probe to evaluate sensitivity and specificity for
+#  - verbose,
+#  - outfile, where to save the output. If None, then stdout
+def evaluate_probe_sens_spec(sequences,taxonomy,args):
+    # set verbose
+    global VERBOSE
+    VERBOSE = args.verbose
+
+    # Zero, find sequences that belong to the selected clade
+    if VERBOSE > 2:
+        UTIL_log.print_log("Identify sequences from the selected clade")
+    seq_sel_clade, seq_other = split_sequences(taxonomy, args.sel_clade, sequences)
+
+    # First, get k_mer recall of specific probe
+    if VERBOSE > 2:
+        UTIL_log.print_log("Identifying k-mer recall and precision for the given k-mer")
+    kmers_recall, kmers_precision = get_kmer_sens(seq_sel_clade, args.probe_to_evaluate)
+
+    if VERBOSE > 2:
+        UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
+    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, len(args.probe_to_evaluate))
+    #print(kmers_sensitivity, kmers_precision)
+    #print(other_sel_clades)
+    probe_order = priotitize_probes(kmers_recall, kmers_precision,len(seq_sel_clade))
+
+    save_result(probe_order, args.outfile, len(seq_sel_clade), kmers_recall, kmers_precision)
