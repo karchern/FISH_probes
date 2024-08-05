@@ -144,7 +144,6 @@ def check_uniqueness_fast(kmers_precision, seq_other,tax_other, probe_len):
         for (s, seq), tax in zip(seq_other.items(), tax_other.values()):
             if kmer in seq:
                 kmers_precision[kmer] += 1
-                other_sel_clades.setdefault(kmer, []).append(s)
                 if not kmer in other_sel_clades:
                     other_sel_clades[kmer] = list()
                 other_sel_clades[kmer].append(tax)                
@@ -227,18 +226,31 @@ def predict_probes(sequences,taxonomy,args):
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
     other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other,tax_other, args.probe_len)
-    breakpoint()
+
+    false_positives_by_clade = get_false_positives_in_other_seqs_by_clade(other_sel_clades)
+
     # Third, prioritize selected probes
     if VERBOSE > 2:
         UTIL_log.print_log("Prioritize selected probes")
     probe_order = priotitize_probes(kmers_recall,kmers_precision,len(seq_sel_clade))
-    breakpoint()
+    
 
     # print/save to outfile
     if VERBOSE > 2:
         UTIL_log.print_log("Save the result")
     save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision)
 
+def get_false_positives_in_other_seqs_by_clade(other_sel_clades):
+    # other_sel_clades is a dictionary of kmer -> list of seq_ids
+    # loop over kmers and find, for each of the 7 tax levels, the most common one
+    # for each kmer, find the most common clade in the list of seq_ids
+    clade_counts = {}
+    for kmer, seq_ids in other_sel_clades.items():
+        clade_counts[kmer] = {}
+        for seq_id in seq_ids:
+            clades = seq_id.split(";")
+            for clade in clades:
+                clade_counts[kmer][clade] = clade_counts[kmer].get(clade, 0) + 1
 
 # Main function (2)
 # ------------------------------------------------------------------------------
