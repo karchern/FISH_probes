@@ -6,9 +6,13 @@ VERBOSE = 1
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
 # ------------------------------------------------------------------------------
-def split_sequences(taxonomy,sel_clade,sequences):
+def split_sequences_and_taxonomy(taxonomy,sel_clade,sequences):
     seq_sel_clade = dict()
+    tax_sel_clade = dict()
+
     seq_other = dict()
+    tax_other = dict()
+    
     for seq in taxonomy:
         # we check if any of the selected clades is present
         to_be_added = False
@@ -19,13 +23,15 @@ def split_sequences(taxonomy,sel_clade,sequences):
         # we add it to the correct
         if to_be_added :
             seq_sel_clade[seq] = sequences[seq]
+            tax_sel_clade[seq] = taxonomy[seq]
         else:
             seq_other[seq] = sequences[seq]
+            tax_other[seq] = taxonomy[seq]
 
     if VERBOSE > 2:
         UTIL_log.print_message("Sequences belonging to the selected clade: "+str(len(seq_sel_clade))+".")
         UTIL_log.print_message("Sequences belonging to other clades: "+str(len(seq_other))+".\n")
-    return seq_sel_clade, seq_other
+    return seq_sel_clade, seq_other, tax_sel_clade, tax_other
 
 # ------------------------------------------------------------------------------
 # Find conserved regions in the sequences from the selected clade
@@ -206,8 +212,7 @@ def predict_probes(sequences,taxonomy,args):
     # Zero, find sequences that belong to the selected clade
     if VERBOSE > 2:
         UTIL_log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other = split_sequences(taxonomy,args.sel_clade,sequences)
-
+    seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy,args.sel_clade,sequences)
     # First, identify possible conserved regions
     if VERBOSE > 2:
         UTIL_log.print_log("Identify k-mers for the query clade")
@@ -247,7 +252,7 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
     # Zero, find sequences that belong to the selected clade
     if VERBOSE > 2:
         UTIL_log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other = split_sequences(taxonomy, args.sel_clade, sequences)
+    seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy, args.sel_clade, sequences)
 
     # First, get k_mer recall of specific probe
     if VERBOSE > 2:
