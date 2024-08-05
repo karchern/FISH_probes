@@ -114,18 +114,18 @@ def get_kmer_sens(seq_sel_clade, kmer):
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
 # ------------------------------------------------------------------------------
-def check_uniqueness(kmers_precision, seq_other, probe_len):
+def check_uniqueness(kmers_precision, seq_other, tax_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    for s in seq_other:
+    for s, tax in zip(seq_other, tax_other):
         this_kmers,this_kmers_N = find_kmers(seq_other[s],probe_len)
         for kmer in this_kmers:
-            if kmer in kmers_precision:
+            if kmer in kmers_precision: 
                 kmers_precision[kmer] = kmers_precision[kmer] + 1
                 if not kmer in other_sel_clades:
                     other_sel_clades[kmer] = list()
-                other_sel_clades[kmer].append(s)
+                other_sel_clades[kmer].append(tax)
                 n_matching_to_other = n_matching_to_other + 1
         # we need to evaluate the ones with an N or others
         for kmer in this_kmers_N:
@@ -135,18 +135,22 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
         UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
     return other_sel_clades
 
-def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
+def check_uniqueness_fast(kmers_precision, seq_other,tax_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    if len(kmers_precision) != 1:
-        asddassda
     # is only on...
     for kmer in kmers_precision.keys():
-        for s, seq in seq_other.items():
+        for (s, seq), tax in zip(seq_other.items(), tax_other.values()):
             if kmer in seq:
                 kmers_precision[kmer] += 1
                 other_sel_clades.setdefault(kmer, []).append(s)
+                if not kmer in other_sel_clades:
+                    other_sel_clades[kmer] = list()
+                other_sel_clades[kmer].append(tax)                
+                n_matching_to_other = n_matching_to_other + 1
+    if VERBOSE > 2:
+        UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")                
     return other_sel_clades
 
 
@@ -217,17 +221,18 @@ def predict_probes(sequences,taxonomy,args):
     if VERBOSE > 2:
         UTIL_log.print_log("Identify k-mers for the query clade")
     kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,args.probe_len,args.perc_seq)
-
+    
     # Second, check if identified regions are unique, compared to the other
     # clades (~ evaluating precision)
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness(kmers_precision,seq_other,args.probe_len)
-
+    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other,tax_other, args.probe_len)
+    breakpoint()
     # Third, prioritize selected probes
     if VERBOSE > 2:
         UTIL_log.print_log("Prioritize selected probes")
     probe_order = priotitize_probes(kmers_recall,kmers_precision,len(seq_sel_clade))
+    breakpoint()
 
     # print/save to outfile
     if VERBOSE > 2:
@@ -261,7 +266,7 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
 
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, len(args.probe_to_evaluate))
+    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, tax_other, len(args.probe_to_evaluate))
     #print(kmers_sensitivity, kmers_precision)
     #print(other_sel_clades)
     probe_order = priotitize_probes(kmers_recall, kmers_precision,len(seq_sel_clade))
