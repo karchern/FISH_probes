@@ -6,9 +6,13 @@ VERBOSE = 1
 # ------------------------------------------------------------------------------
 # Find sequences from the selected clade
 # ------------------------------------------------------------------------------
-def split_sequences(taxonomy,sel_clade,sequences):
+def split_sequences_and_taxonomy(taxonomy,sel_clade,sequences):
     seq_sel_clade = dict()
+    tax_sel_clade = dict()
+
     seq_other = dict()
+    tax_other = dict()
+    
     for seq in taxonomy:
         # we check if any of the selected clades is present
         to_be_added = False
@@ -19,13 +23,15 @@ def split_sequences(taxonomy,sel_clade,sequences):
         # we add it to the correct
         if to_be_added :
             seq_sel_clade[seq] = sequences[seq]
+            tax_sel_clade[seq] = taxonomy[seq]
         else:
             seq_other[seq] = sequences[seq]
+            tax_other[seq] = taxonomy[seq]
 
     if VERBOSE > 2:
         UTIL_log.print_message("Sequences belonging to the selected clade: "+str(len(seq_sel_clade))+".")
         UTIL_log.print_message("Sequences belonging to other clades: "+str(len(seq_other))+".\n")
-    return seq_sel_clade, seq_other
+    return seq_sel_clade, seq_other, tax_sel_clade, tax_other
 
 # ------------------------------------------------------------------------------
 # Find conserved regions in the sequences from the selected clade
@@ -108,18 +114,18 @@ def get_kmer_sens(seq_sel_clade, kmer):
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
 # ------------------------------------------------------------------------------
-def check_uniqueness(kmers_precision, seq_other, probe_len):
+def check_uniqueness(kmers_precision, seq_other, tax_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    for s in seq_other:
+    for s, tax in zip(seq_other, tax_other):
         this_kmers,this_kmers_N = find_kmers(seq_other[s],probe_len)
         for kmer in this_kmers:
-            if kmer in kmers_precision:
+            if kmer in kmers_precision: 
                 kmers_precision[kmer] = kmers_precision[kmer] + 1
                 if not kmer in other_sel_clades:
                     other_sel_clades[kmer] = list()
-                other_sel_clades[kmer].append(s)
+                other_sel_clades[kmer].append(tax)
                 n_matching_to_other = n_matching_to_other + 1
         # we need to evaluate the ones with an N or others
         for kmer in this_kmers_N:
@@ -129,18 +135,21 @@ def check_uniqueness(kmers_precision, seq_other, probe_len):
         UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
     return other_sel_clades
 
-def check_uniqueness_fast(kmers_precision, seq_other, probe_len):
+def check_uniqueness_fast(kmers_precision, seq_other,tax_other, probe_len):
     n_matching_to_other = 0
     # we check if the kmers are covered by other sequences
     other_sel_clades = dict()
-    if len(kmers_precision) != 1:
-        asddassda
     # is only on...
     for kmer in kmers_precision.keys():
-        for s, seq in seq_other.items():
+        for (s, seq), tax in zip(seq_other.items(), tax_other.values()):
             if kmer in seq:
                 kmers_precision[kmer] += 1
-                other_sel_clades.setdefault(kmer, []).append(s)
+                if not kmer in other_sel_clades:
+                    other_sel_clades[kmer] = list()
+                other_sel_clades[kmer].append(tax)                
+                n_matching_to_other = n_matching_to_other + 1
+    if VERBOSE > 2:
+        UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")                
     return other_sel_clades
 
 
@@ -174,15 +183,22 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
 # ------------------------------------------------------------------------------
 # Save/Print result
 # ------------------------------------------------------------------------------
-def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision):
+def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision, **kwargs):
     # prepare lines to print
     to_print = list()
-    to_print.append("probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\tGC_content\tsequence_entropy\tmelting_temperature\tprobe_accessibility\n")
+    a = "\t".join(['n_wrong_fam_1', "n_wrong_fam_2", "n_wrong_fam_3"])
+    b = "\t".join(['n_wrong_genus_1', "n_wrong_genus_2", "n_wrong_genus_3"])
+    to_print.append(f"probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\t{a}\t{b}\tGC_content\tsequence_entropy\tmelting_temperature\tprobe_accessibility\n")
 
     for kmer in probe_order:
+        # extend kwargs['commonly_hit_wrong_families'][kmer] and kwargs['commonly_hit_wrong_genera'][kmer] to 3 elements
+        kwargs['commonly_hit_wrong_families'][kmer] = kwargs['commonly_hit_wrong_families'][kmer] + ["NA"] * (3 - len(kwargs['commonly_hit_wrong_families'][kmer]))
+        kwargs['commonly_hit_wrong_genera'][kmer] = kwargs['commonly_hit_wrong_genera'][kmer] + ["NA"] * (3 - len(kwargs['commonly_hit_wrong_genera'][kmer]))
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
+        this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_families'][kmer])+"\t"
+        this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_genera'][kmer])+"\t"
         this_str = this_str+UTIL_probe.create_to_print(kmer)
         to_print.append(this_str+"\n")
 
@@ -198,6 +214,15 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision)
 #  - probe_len, length for the selected probe (positive integer)
 #  - verbose,
 #  - outfile, where to save the output. If None, then stdout
+
+def get_tax_db_counts_per_clade(taxonomy, tax_level):
+    from collections import defaultdict
+    clade_counts = defaultdict(lambda: 0)
+    for seq_id, tax in taxonomy.items():
+        clade = tax.split(";")[tax_level]
+        clade_counts[clade] += 1
+    return clade_counts
+
 def predict_probes(sequences,taxonomy,args):
     # set verbose
     global VERBOSE
@@ -206,30 +231,68 @@ def predict_probes(sequences,taxonomy,args):
     # Zero, find sequences that belong to the selected clade
     if VERBOSE > 2:
         UTIL_log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other = split_sequences(taxonomy,args.sel_clade,sequences)
-
+    seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy,args.sel_clade,sequences)
     # First, identify possible conserved regions
     if VERBOSE > 2:
         UTIL_log.print_log("Identify k-mers for the query clade")
     kmers_recall,kmers_precision = find_conserved_regions(seq_sel_clade,args.probe_len,args.perc_seq)
-
+    
     # Second, check if identified regions are unique, compared to the other
     # clades (~ evaluating precision)
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness(kmers_precision,seq_other,args.probe_len)
+    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other,tax_other, args.probe_len)
 
+    family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
+    genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
+
+    commonly_hit_wrong_families  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
+    commonly_hit_wrong_genera = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
     # Third, prioritize selected probes
     if VERBOSE > 2:
         UTIL_log.print_log("Prioritize selected probes")
     probe_order = priotitize_probes(kmers_recall,kmers_precision,len(seq_sel_clade))
+    
 
     # print/save to outfile
     if VERBOSE > 2:
         UTIL_log.print_log("Save the result")
-    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision)
+    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families, 'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
 
+def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_level = 5, top = 5):
+    # other_sel_clades is a dictionary of kmer -> list of seq_ids
+    # loop over kmers and find, for each of the 7 tax levels, the most common one
+    # for each kmer, find the most common clade in the list of seq_ids
+    clade_counts = {}
+    clade_fractions = {}
+    for kmer, taxonomies in other_sel_clades.items():
+        clade_counts[kmer] = {}
+        for taxonomy in taxonomies:
+            clade = taxonomy.split(";")[tax_level]
+            clade_counts[kmer][clade] = clade_counts[kmer].get(clade, 0) + 1
 
+    for kmer, clade_count in clade_counts.items():
+        clade_fractions[kmer] = {}
+        for clade, count in clade_count.items():
+            clade_fractions[kmer][clade] = count / clade_counts_total[clade]
+    
+    
+    
+    # Sort clade_counts and return top x clades + count per kmer
+    top_x_clades = {}
+    for (kmer, clade_count), (_, clade_fraction) in zip(clade_counts.items(), clade_fractions.items()):
+        # Consider only clades with at least 10 sequences in the database
+        clade_count = {k: v for k, v in clade_count.items() if clade_counts_total[k] > 10}
+        clade_fraction = {k: v for k, v in clade_fraction.items() if clade_counts_total[k] > 10}
+        sorted_clade_count = dict(sorted(clade_count.items(), key=lambda item: item[1], reverse=True))
+        top_c = 1
+        top_x_clades[kmer] = []
+        for top_clade, count in sorted_clade_count.items():
+            top_x_clades[kmer].append(f"{top_clade}: {count}/{clade_fraction[top_clade]:.2f}")
+            top_c += 1
+            if top_c > top:
+                break
+    return(top_x_clades)
 # Main function (2)
 # ------------------------------------------------------------------------------
 # Input:
@@ -247,7 +310,7 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
     # Zero, find sequences that belong to the selected clade
     if VERBOSE > 2:
         UTIL_log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other = split_sequences(taxonomy, args.sel_clade, sequences)
+    seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy, args.sel_clade, sequences)
 
     # First, get k_mer recall of specific probe
     if VERBOSE > 2:
@@ -256,9 +319,18 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
 
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, len(args.probe_to_evaluate))
+    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, tax_other, len(args.probe_to_evaluate))
     #print(kmers_sensitivity, kmers_precision)
     #print(other_sel_clades)
     probe_order = priotitize_probes(kmers_recall, kmers_precision,len(seq_sel_clade))
 
-    save_result(probe_order, args.outfile, len(seq_sel_clade), kmers_recall, kmers_precision)
+    family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
+    genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
+
+    commonly_hit_wrong_families, commonly_hit_wrong_families_fractions  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
+    commonly_hit_wrong_genera, commonly_hit_wrong_genera_fractions = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
+
+    # print/save to outfile
+    if VERBOSE > 2:
+        UTIL_log.print_log("Save the result")
+    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families, 'commonly_hit_wrong_families_fractions' : commonly_hit_wrong_families_fractions, 'commonly_hit_wrong_genera' : commonly_hit_wrong_genera, 'commonly_hit_wrong_genera_fractions' : commonly_hit_wrong_genera_fractions})
