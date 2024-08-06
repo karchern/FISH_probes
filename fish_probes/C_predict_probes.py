@@ -187,19 +187,18 @@ def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision,
     # prepare lines to print
     to_print = list()
     a = "\t".join(['n_wrong_fam_1', "n_wrong_fam_2", "n_wrong_fam_3"])
-    aa = "\t".join(['n_wrong_fam_1_frac', "n_wrong_fam_2_frac", "n_wrong_fam_3_frac"])
     b = "\t".join(['n_wrong_genus_1', "n_wrong_genus_2", "n_wrong_genus_3"])
-    bb = "\t".join(['n_wrong_genus_1_frac', "n_wrong_genus_2_frac", "n_wrong_genus_3_frac"])
-    to_print.append(f"probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\t{a}\t{aa}\t{b}\t{bb}\tGC_content\tsequence_entropy\tmelting_temperature\tprobe_accessibility\n")
+    to_print.append(f"probe\tperc_covered_sequences\tn_covered_sequences\tn_covered_others\t{a}\t{b}\tGC_content\tsequence_entropy\tmelting_temperature\tprobe_accessibility\n")
 
     for kmer in probe_order:
+        # extend kwargs['commonly_hit_wrong_families'][kmer] and kwargs['commonly_hit_wrong_genera'][kmer] to 3 elements
+        kwargs['commonly_hit_wrong_families'][kmer] = kwargs['commonly_hit_wrong_families'][kmer] + ["NA"] * (3 - len(kwargs['commonly_hit_wrong_families'][kmer]))
+        kwargs['commonly_hit_wrong_genera'][kmer] = kwargs['commonly_hit_wrong_genera'][kmer] + ["NA"] * (3 - len(kwargs['commonly_hit_wrong_genera'][kmer]))
         this_str = kmer+"\t"+str(kmers_recall[kmer]/n_seq_clade)+"\t"
         this_str = this_str+str(kmers_recall[kmer])+"\t"
         this_str = this_str+str(kmers_precision[kmer])+"\t"
         this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_families'][kmer])+"\t"
-        this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_families_fractions'][kmer])+"\t"
         this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_genera'][kmer])+"\t"
-        this_str = this_str+"\t".join(kwargs['commonly_hit_wrong_genera_fractions'][kmer])+"\t"
         this_str = this_str+UTIL_probe.create_to_print(kmer)
         to_print.append(this_str+"\n")
 
@@ -247,8 +246,8 @@ def predict_probes(sequences,taxonomy,args):
     family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
     genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
 
-    commonly_hit_wrong_families, commonly_hit_wrong_families_fractions  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
-    commonly_hit_wrong_genera, commonly_hit_wrong_genera_fractions = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
+    commonly_hit_wrong_families  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
+    commonly_hit_wrong_genera = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
     # Third, prioritize selected probes
     if VERBOSE > 2:
         UTIL_log.print_log("Prioritize selected probes")
@@ -258,7 +257,7 @@ def predict_probes(sequences,taxonomy,args):
     # print/save to outfile
     if VERBOSE > 2:
         UTIL_log.print_log("Save the result")
-    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families, 'commonly_hit_wrong_families_fractions' : commonly_hit_wrong_families_fractions, 'commonly_hit_wrong_genera' : commonly_hit_wrong_genera, 'commonly_hit_wrong_genera_fractions' : commonly_hit_wrong_genera_fractions})
+    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families, 'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
 
 def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_level = 5, top = 5):
     # other_sel_clades is a dictionary of kmer -> list of seq_ids
@@ -280,23 +279,20 @@ def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_leve
     
     
     # Sort clade_counts and return top x clades + count per kmer
-    top_x_clades_counts = {}
-    top_x_clades_fractions = {}
+    top_x_clades = {}
     for (kmer, clade_count), (_, clade_fraction) in zip(clade_counts.items(), clade_fractions.items()):
         # Consider only clades with at least 10 sequences in the database
         clade_count = {k: v for k, v in clade_count.items() if clade_counts_total[k] > 10}
         clade_fraction = {k: v for k, v in clade_fraction.items() if clade_counts_total[k] > 10}
         sorted_clade_count = dict(sorted(clade_count.items(), key=lambda item: item[1], reverse=True))
         top_c = 1
-        top_x_clades_counts[kmer] = []
-        top_x_clades_fractions[kmer] = []
+        top_x_clades[kmer] = []
         for top_clade, count in sorted_clade_count.items():
-            top_x_clades_counts[kmer].append(f"{top_clade}: {count}")
-            top_x_clades_fractions[kmer].append(f"{top_clade}: {clade_fraction[top_clade]:.2f}")
+            top_x_clades[kmer].append(f"{top_clade}: {count}/{clade_fraction[top_clade]:.2f}")
             top_c += 1
             if top_c > top:
                 break
-    return(top_x_clades_counts, top_x_clades_fractions)
+    return(top_x_clades)
 # Main function (2)
 # ------------------------------------------------------------------------------
 # Input:
