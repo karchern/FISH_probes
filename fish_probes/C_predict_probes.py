@@ -184,6 +184,7 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
 # Save/Print result
 # ------------------------------------------------------------------------------
 def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision, **kwargs):
+    breakpoint()
     # prepare lines to print
     to_print = list()
     a = "\t".join(['n_wrong_fam_1', "n_wrong_fam_2", "n_wrong_fam_3"])
@@ -242,6 +243,8 @@ def predict_probes(sequences,taxonomy,args):
     if VERBOSE > 2:
         UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
     other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other,tax_other, args.probe_len)
+    # other_sel_clades is a dictionary mapping kmers (ie probe candidates) to the taxonomies (out of clade)
+    # hits
 
     family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
     genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
@@ -263,6 +266,7 @@ def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_leve
     # other_sel_clades is a dictionary of kmer -> list of seq_ids
     # loop over kmers and find, for each of the 7 tax levels, the most common one
     # for each kmer, find the most common clade in the list of seq_ids
+    from collections import defaultdict
     clade_counts = {}
     clade_fractions = {}
     for kmer, taxonomies in other_sel_clades.items():
@@ -277,9 +281,8 @@ def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_leve
             clade_fractions[kmer][clade] = count / clade_counts_total[clade]
     
     
-    
     # Sort clade_counts and return top x clades + count per kmer
-    top_x_clades = {}
+    top_x_clades = defaultdict(lambda: ["NA"])
     for (kmer, clade_count), (_, clade_fraction) in zip(clade_counts.items(), clade_fractions.items()):
         # Consider only clades with at least 10 sequences in the database
         clade_count = {k: v for k, v in clade_count.items() if clade_counts_total[k] > 10}
@@ -322,7 +325,7 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
     other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, tax_other, len(args.probe_to_evaluate))
     #print(kmers_sensitivity, kmers_precision)
     #print(other_sel_clades)
-    probe_order = priotitize_probes(kmers_recall, kmers_precision,len(seq_sel_clade))
+    probe_order = priotitize_probes(kmers_recall, kmers_precision, len(seq_sel_clade))
 
     family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
     genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
