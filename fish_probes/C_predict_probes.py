@@ -327,10 +327,10 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
     family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
     genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
 
-    commonly_hit_wrong_families, commonly_hit_wrong_families_fractions  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
-    commonly_hit_wrong_genera, commonly_hit_wrong_genera_fractions = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
+    commonly_hit_wrong_families  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
+    commonly_hit_wrong_genera = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
 
     # print/save to outfile
     if VERBOSE > 2:
         UTIL_log.print_log("Save the result")
-    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families, 'commonly_hit_wrong_families_fractions' : commonly_hit_wrong_families_fractions, 'commonly_hit_wrong_genera' : commonly_hit_wrong_genera, 'commonly_hit_wrong_genera_fractions' : commonly_hit_wrong_genera_fractions})
+    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families,  'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
