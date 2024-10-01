@@ -9,7 +9,8 @@ setup(
     packages=find_packages(exclude=["test"]),
     # we add the test files
     package_data={
-        "fish_probes.test": ["seq.fa", "tax"]
+        "fish_probes.test": ["seq.fa", "tax"],
+        'fish_probes.reference_sequences' : ['reference_alignment.faa']
     },
     # entry point
     entry_points={
