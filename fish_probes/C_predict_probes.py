@@ -184,7 +184,6 @@ def priotitize_probes(kmers_recall,kmers_precision,n_seq_clade):
 # Save/Print result
 # ------------------------------------------------------------------------------
 def save_result(probe_order, outfile, n_seq_clade, kmers_recall,kmers_precision, **kwargs):
-    breakpoint()
     # prepare lines to print
     to_print = list()
     a = "\t".join(['n_wrong_fam_1', "n_wrong_fam_2", "n_wrong_fam_3"])
