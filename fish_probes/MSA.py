@@ -1,7 +1,6 @@
 import importlib_resources
 from dataclasses import dataclass
 from Bio import SeqIO
-import typing
 from typing import List
 
 @dataclass

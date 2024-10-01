@@ -18,5 +18,9 @@ setup(
             'fish_probes = fish_probes.MAIN:main',
         ]
     },
+    install_requires=[
+        'biopython',
+        'matplotlib',
+    ],
     include_package_data=True,
 )
