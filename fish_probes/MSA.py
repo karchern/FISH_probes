@@ -32,15 +32,20 @@ class MSA:
     def from_reference_alignment(cls):
         path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
         data = list(SeqIO.parse(path, "fasta"))
-        return(MSA(data))
+        return(MSA(data, aligned=True))
 
     #@property
     @cached_property
     def entropy(self):
-        print("Calculating entropy - but only because you asked :)")
         return MSA.calculate_entropy(self)
 
-    def calculate_entropy(self):
+    @cached_property
+    def consensus_sequence(self):
+        return MSA.calculate_consensus(self)
+
+    def calculate_entropy(self) -> List[float]:
+        if not self.aligned:
+            raise ValueError("Cannot calculate entropy from unaligned sequences") from None        
         entropies = []
         alignment_length = len(self.sequences[0])
         for i in range(alignment_length):
@@ -53,6 +58,17 @@ class MSA:
                 entropy -= frequency * log2(frequency)
             entropies.append(entropy)
         return entropies
+
+    def calculate_consensus(self) -> List[str]:
+        if not self.aligned:
+            raise ValueError("Cannot calculate consensus sequence from unaligned sequences") from None
+        consensus = []
+        alignment_length = len(self.sequences[0])
+        for i in range(alignment_length):
+            column = [seq.seq[i] for seq in self.sequences]
+            column_counter = Counter(column)
+            consensus.append(column_counter.most_common(1)[0][0])
+        return consensus
 
 
 
