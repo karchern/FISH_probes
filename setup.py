@@ -19,7 +19,6 @@ setup(
         ]
     },
     install_requires=[
-        'json',
         'biopython',
         'matplotlib',
     ],
