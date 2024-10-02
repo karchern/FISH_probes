@@ -30,35 +30,42 @@ class MSA:
 
     @classmethod
     def from_reference_alignment(cls):
+        print("Loading reference alignment, might mean entropy plot is not optimal.")
         path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
+        data = list(SeqIO.parse(path, "fasta"))
+        return(MSA(data, aligned=True))
+
+    @classmethod
+    def from_alignment(cls, path: str):
+        #path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
         data = list(SeqIO.parse(path, "fasta"))
         return(MSA(data, aligned=True))
 
     #@property
     @cached_property
-    def entropy(self):
-        return MSA.calculate_entropy(self)
+    def entropy_rolling_window(self):
+        return MSA.calculate_entropy_rolling_window(self)
 
     @cached_property
-    def consensus_sequence(self):
+    def consensus(self):
         return MSA.calculate_consensus(self)
 
-    def calculate_entropy(self) -> List[float]:
+    def calculate_entropy_rolling_window(self, window_size = 25) -> List[float]:
         if not self.aligned:
             raise ValueError("Cannot calculate entropy from unaligned sequences") from None        
         entropies = []
         alignment_length = len(self.sequences[0])
-        for i in range(alignment_length):
-            column = [seq.seq[i] for seq in self.sequences]
-            column_counter = Counter(column)
-            column_length = len(column)
+        for i in range(alignment_length - window_size + 1):
+            window = [seq.seq[i:i+window_size] for seq in self.sequences]
+            window_counter = Counter(window)
+            window_length = len(window)
             entropy = 0
-            for count in column_counter.values():
-                frequency = count / column_length
+            for count in window_counter.values():
+                frequency = count / window_length
                 entropy -= frequency * log2(frequency)
             entropies.append(entropy)
         return entropies
-
+    
     def calculate_consensus(self) -> List[str]:
         if not self.aligned:
             raise ValueError("Cannot calculate consensus sequence from unaligned sequences") from None
@@ -74,4 +81,4 @@ class MSA:
 
 if __name__ == "__main__":
     msa = MSA.from_reference_alignment()
-    entropy = msa.entropy
+    entropy = msa.entropy_rolling_window
