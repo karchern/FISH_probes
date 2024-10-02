@@ -1,6 +1,7 @@
 import sys
 import argparse
 from fish_probes import UTIL_log
+import json
 
 VERBOSE = 1
 

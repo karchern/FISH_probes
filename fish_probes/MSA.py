@@ -32,6 +32,8 @@ class MSA:
     def from_reference_alignment(cls):
         print("Loading reference alignment, might mean entropy plot is not optimal.")
         path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
+        #path = "/Users/karcher/Downloads/mafft-I20241001-122343-0344-5047870-p1m.aln_gapless2.-fasta"
+        #path = "/Users/karcher/Downloads/mafft-I20241001-122343-0344-5047870-p1m.aln_gapless.-fasta"
         data = list(SeqIO.parse(path, "fasta"))
         return(MSA(data, aligned=True))
 
@@ -55,8 +57,10 @@ class MSA:
             raise ValueError("Cannot calculate entropy from unaligned sequences") from None        
         entropies = []
         alignment_length = len(self.sequences[0])
-        for i in range(alignment_length - window_size + 1):
-            window = [seq.seq[i:i+window_size] for seq in self.sequences]
+        for i in range(alignment_length):
+            start = max(0, i - window_size // 2)
+            end = min(alignment_length, start + window_size)
+            window = [seq.seq[start:end] for seq in self.sequences]
             window_counter = Counter(window)
             window_length = len(window)
             entropy = 0

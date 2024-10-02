@@ -139,8 +139,8 @@ def get_entropy_plot():
     sys.stderr.write("fish_probes get_entropy_plot ")
     sys.stderr.write(UTIL_log.colour("-s ", "blue"))
     sys.stderr.write("<seq> ")
-    sys.stderr.write(UTIL_log.colour("-pte ", "blue"))
-    sys.stderr.write("<probes to evaluate>")
+    sys.stderr.write(UTIL_log.colour("-pte_map ", "blue"))
+    sys.stderr.write("<taxon probe map>")
 
     sys.stderr.write(" [option]\n\n")
 

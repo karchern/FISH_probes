@@ -339,23 +339,20 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
             UTIL_log.print_log("Save the result")
         save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families,  'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
 
-    kmer_info = get_kmer_info(sequences, args)
-        
-    return(kmer_info)
     
-def get_kmer_info(sequences, args):
+def get_kmer_info(sequences, kmer_map):
     kmer_info = []
-    for probe in args.probe_to_evaluate.split(","):
+    for taxon, probe in kmer_map.items():
         probe_found = False
         for in_clade_seq in sequences:
             if probe in sequences[in_clade_seq]:
                 print(f"Probe {probe} found in in-clade sequence {in_clade_seq}")
                 # Find position of match
                 match_start = sequences[in_clade_seq].index(probe)
-                kmer_info.append([str(probe), match_start, sequences[in_clade_seq]])
+                kmer_info.append([taxon, str(probe), match_start, sequences[in_clade_seq]])
                 probe_found = True
                 break
         if not probe_found:
             print(f"Probe {probe} NOT found in in-clade sequence {in_clade_seq}")
-            kmer_info.append([str(probe), None, sequences[in_clade_seq]])    
+            kmer_info.append([taxon, str(probe), None, sequences[in_clade_seq]])    
     return(kmer_info)

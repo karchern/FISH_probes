@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import json
 try:
 
     # import UTIL
@@ -37,15 +38,12 @@ def main():
     
     if args.command == "evaluate_probe_sens_spec":
         sequences,taxonomy = C_load_input.load_and_check_input(args)
-        kmer_info = C_predict_probes.evaluate_probe_sens_spec(sequences,taxonomy,args)
-        Plots.EntropyPlot(
-            msa = reference_msa, 
-            kmer_info = kmer_info,
-            )
+        C_predict_probes.evaluate_probe_sens_spec(sequences,taxonomy,args)
 
     if args.command == "get_entropy_plot":
         sequences = C_load_input.load_and_check_input(args, only_seqs = True)
-        kmer_info = C_predict_probes.get_kmer_info(sequences,args)
+        kmer_map = json.load(open(args.taxon_probe_map))
+        kmer_info = C_predict_probes.get_kmer_info(sequences, kmer_map)
         Plots.EntropyPlot(
             msa = reference_msa, 
             kmer_info = kmer_info,

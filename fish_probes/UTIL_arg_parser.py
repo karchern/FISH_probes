@@ -30,6 +30,10 @@ def input_parser(tool_version):
                         #help='Clade selected to design the primers',nargs="+")
                         help='probe to evaluate sensitivity and specificity for')    
                         
+    # Specific probe to evaluate for evaluate_probe_sens_spec
+    parser.add_argument('-pte_map', dest = 'taxon_probe_map', action="store", default=None,
+                        #help='Clade selected to design the primers',nargs="+")
+                        help='json file mapping taxa to their probe sequences')    
 
     # Verbose level
     parser.add_argument('-v', action='store', type=int, default=3,
@@ -132,9 +136,9 @@ def input_parser(tool_version):
         if args.sequences is None:
             UTIL_print_menus.get_entropy_plot()
             UTIL_log.print_error("Missing -s.")
-        if args.probe_to_evaluate is None:
+        if args.taxon_probe_map is None:
             UTIL_print_menus.get_entropy_plot()
-            UTIL_log.print_error("Missing -pte")
+            UTIL_log.print_error("Missing -pte_map")
 
     return args
 
