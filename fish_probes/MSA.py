@@ -31,9 +31,8 @@ class MSA:
     @classmethod
     def from_reference_alignment(cls):
         print("Loading reference alignment, might mean entropy plot is not optimal.")
-        path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
-        #path = "/Users/karcher/Downloads/mafft-I20241001-122343-0344-5047870-p1m.aln_gapless2.-fasta"
-        #path = "/Users/karcher/Downloads/mafft-I20241001-122343-0344-5047870-p1m.aln_gapless.-fasta"
+        #path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment.faa")
+        path = importlib_resources.files("fish_probes.reference_sequences").joinpath("reference_alignment_2.faa")
         data = list(SeqIO.parse(path, "fasta"))
         return(MSA(data, aligned=True))
 

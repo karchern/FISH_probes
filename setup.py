@@ -10,7 +10,7 @@ setup(
     # we add the test files
     package_data={
         "fish_probes.test": ["seq.fa", "tax"],
-        'fish_probes.reference_sequences' : ['reference_alignment.faa']
+        'fish_probes.reference_sequences' : ['reference_alignment.faa', 'reference_alignment_2.faa']
     },
     # entry point
     entry_points={
