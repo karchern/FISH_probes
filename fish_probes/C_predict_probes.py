@@ -114,26 +114,26 @@ def get_kmer_sens(seq_sel_clade, kmer):
 # ------------------------------------------------------------------------------
 # Starting from the conserved regions, check if they are unique
 # ------------------------------------------------------------------------------
-def check_uniqueness(kmers_precision, seq_other, tax_other, probe_len):
-    n_matching_to_other = 0
-    # we check if the kmers are covered by other sequences
-    other_sel_clades = dict()
-    for s, tax in zip(seq_other, tax_other):
-        this_kmers,this_kmers_N = find_kmers(seq_other[s],probe_len)
-        for kmer in this_kmers:
-            if kmer in kmers_precision: 
-                kmers_precision[kmer] = kmers_precision[kmer] + 1
-                if not kmer in other_sel_clades:
-                    other_sel_clades[kmer] = list()
-                other_sel_clades[kmer].append(tax)
-                n_matching_to_other = n_matching_to_other + 1
-        # we need to evaluate the ones with an N or others
-        for kmer in this_kmers_N:
-            dummy = "TODO"
+# def check_uniqueness(kmers_precision, seq_other, tax_other, probe_len):
+#     n_matching_to_other = 0
+#     # we check if the kmers are covered by other sequences
+#     other_sel_clades = dict()
+#     for s, tax in zip(seq_other, tax_other):
+#         this_kmers,this_kmers_N = find_kmers(seq_other[s],probe_len)
+#         for kmer in this_kmers:
+#             if kmer in kmers_precision: 
+#                 kmers_precision[kmer] = kmers_precision[kmer] + 1
+#                 if not kmer in other_sel_clades:
+#                     other_sel_clades[kmer] = list()
+#                 other_sel_clades[kmer].append(tax)
+#                 n_matching_to_other = n_matching_to_other + 1
+#         # we need to evaluate the ones with an N or others
+#         for kmer in this_kmers_N:
+#             dummy = "TODO"
 
-    if VERBOSE > 2:
-        UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
-    return other_sel_clades
+#     if VERBOSE > 2:
+#         UTIL_log.print_message("The selected probes map to other "+str(n_matching_to_other)+" sequences.\n")
+#     return other_sel_clades
 
 def check_uniqueness_fast(kmers_precision, seq_other,tax_other, probe_len):
     n_matching_to_other = 0
@@ -295,6 +295,7 @@ def get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total, tax_leve
             if top_c > top:
                 break
     return(top_x_clades)
+
 # Main function (2)
 # ------------------------------------------------------------------------------
 # Input:
@@ -310,29 +311,51 @@ def evaluate_probe_sens_spec(sequences,taxonomy,args):
     VERBOSE = args.verbose
 
     # Zero, find sequences that belong to the selected clade
-    if VERBOSE > 2:
-        UTIL_log.print_log("Identify sequences from the selected clade")
-    seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy, args.sel_clade, sequences)
+    for probe in args.probe_to_evaluate.split(","):
+        #if VERBOSE > 2:
+            #UTIL_log.print_log("Identify sequences from the selected clade")
+        seq_sel_clade, seq_other, tax_sel_clade, tax_other = split_sequences_and_taxonomy(taxonomy, args.sel_clade, sequences)
 
-    # First, get k_mer recall of specific probe
-    if VERBOSE > 2:
-        UTIL_log.print_log("Identifying k-mer recall and precision for the given k-mer")
-    kmers_recall, kmers_precision = get_kmer_sens(seq_sel_clade, args.probe_to_evaluate)
+        # First, get k_mer recall of specific probe
+        #if VERBOSE > 2:
+            #UTIL_log.print_log("Identifying k-mer recall and precision for the given k-mer")
+        kmers_recall, kmers_precision = get_kmer_sens(seq_sel_clade, probe)
 
-    if VERBOSE > 2:
-        UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
-    other_sel_clades = check_uniqueness_fast(kmers_precision,seq_other, tax_other, len(args.probe_to_evaluate))
-    #print(kmers_sensitivity, kmers_precision)
-    #print(other_sel_clades)
-    probe_order = priotitize_probes(kmers_recall, kmers_precision, len(seq_sel_clade))
+        #if VERBOSE > 2:
+            #UTIL_log.print_log("Check if the identified k-mers are present in the other clades")
+        other_sel_clades = check_uniqueness_fast(kmers_precision, seq_other, tax_other, len(probe))
+        #print(kmers_sensitivity, kmers_precision)
+        #print(other_sel_clades)
+        probe_order = priotitize_probes(kmers_recall, kmers_precision, len(seq_sel_clade))
 
-    family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
-    genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
+        family_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 4)
+        genus_counts = get_tax_db_counts_per_clade(taxonomy, tax_level = 5)
 
-    commonly_hit_wrong_families  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
-    commonly_hit_wrong_genera = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
+        commonly_hit_wrong_families  = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = family_counts, tax_level = 4, top = 3)
+        commonly_hit_wrong_genera = get_commonly_hit_wrong_clades(other_sel_clades, clade_counts_total = genus_counts, tax_level = 5, top = 3)
 
-    # print/save to outfile
-    if VERBOSE > 2:
-        UTIL_log.print_log("Save the result")
-    save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families,  'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
+        # print/save to outfile
+        if VERBOSE > 2:
+            UTIL_log.print_log("Save the result")
+        save_result(probe_order, args.outfile,len(seq_sel_clade),kmers_recall,kmers_precision, **{'commonly_hit_wrong_families' : commonly_hit_wrong_families,  'commonly_hit_wrong_genera' : commonly_hit_wrong_genera})
+
+    kmer_info = get_kmer_info(sequences, args)
+        
+    return(kmer_info)
+    
+def get_kmer_info(sequences, args):
+    kmer_info = []
+    for probe in args.probe_to_evaluate.split(","):
+        probe_found = False
+        for in_clade_seq in sequences:
+            if probe in sequences[in_clade_seq]:
+                print(f"Probe {probe} found in in-clade sequence {in_clade_seq}")
+                # Find position of match
+                match_start = sequences[in_clade_seq].index(probe)
+                kmer_info.append([str(probe), match_start, sequences[in_clade_seq]])
+                probe_found = True
+                break
+        if not probe_found:
+            print(f"Probe {probe} NOT found in in-clade sequence {in_clade_seq}")
+            kmer_info.append([str(probe), None, sequences[in_clade_seq]])    
+    return(kmer_info)

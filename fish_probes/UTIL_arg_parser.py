@@ -10,7 +10,7 @@ def input_parser(tool_version):
 
     # COMMAND
     parser.add_argument('command', action="store", default=None,
-                        help='command', choices=['design', 'check_probe', 'test', 'evaluate_probe_sens_spec'])
+                        help='command', choices=['design', 'check_probe', 'test', 'evaluate_probe_sens_spec', "get_entropy_plot"])
 
     # File with the sequences in fasta format
     parser.add_argument('-s', dest = 'sequences', action="store", default=None,
@@ -29,6 +29,7 @@ def input_parser(tool_version):
     parser.add_argument('-pte', dest = 'probe_to_evaluate', action="store", default=None,
                         #help='Clade selected to design the primers',nargs="+")
                         help='probe to evaluate sensitivity and specificity for')    
+                        
 
     # Verbose level
     parser.add_argument('-v', action='store', type=int, default=3,
@@ -122,6 +123,17 @@ def input_parser(tool_version):
             UTIL_log.print_error("Missing -c.")
         if args.probe_to_evaluate is None:
             UTIL_print_menus.evaluate_probe_sens_spec()
+            UTIL_log.print_error("Missing -pte")
+
+    if args.command == 'get_entropy_plot':
+        if args.help:
+            sys.exit("TODO: Implement help text")
+        # There are four mandatory inputs (three are shared with args.command == "design")
+        if args.sequences is None:
+            UTIL_print_menus.get_entropy_plot()
+            UTIL_log.print_error("Missing -s.")
+        if args.probe_to_evaluate is None:
+            UTIL_print_menus.get_entropy_plot()
             UTIL_log.print_error("Missing -pte")
 
     return args

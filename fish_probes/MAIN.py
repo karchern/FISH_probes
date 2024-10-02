@@ -3,7 +3,7 @@ import sys
 try:
 
     # import UTIL
-    from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe, C_test, MSA
+    from fish_probes import UTIL_log, UTIL_arg_parser, UTIL_probe, C_test, MSA, Plots
     #import UTIL_log, UTIL_arg_parser, UTIL_probe, C_test
     # import commands files
     from fish_probes import C_load_input, C_predict_probes
@@ -18,11 +18,14 @@ except Exception as e:
 
 def main():
     # load sys.argv
+    
     args = UTIL_arg_parser.input_parser(tool_version)
+    reference_msa = MSA.MSA.from_reference_alignment()
     if args.verbose > 2:
         UTIL_log.print_message("Call: ")
         UTIL_log.print_message(" ".join(sys.argv)+"\n")
 
+    
     # find probes --------------------------------------------------------------
     if args.command == "design":
         sequences,taxonomy = C_load_input.load_and_check_input(args)
@@ -34,8 +37,19 @@ def main():
     
     if args.command == "evaluate_probe_sens_spec":
         sequences,taxonomy = C_load_input.load_and_check_input(args)
-        msa = MSA.MSA.from_reference_alignment()
-        C_predict_probes.evaluate_probe_sens_spec(sequences,taxonomy,args)
+        kmer_info = C_predict_probes.evaluate_probe_sens_spec(sequences,taxonomy,args)
+        Plots.EntropyPlot(
+            msa = reference_msa, 
+            kmer_info = kmer_info,
+            )
+
+    if args.command == "get_entropy_plot":
+        sequences = C_load_input.load_and_check_input(args, only_seqs = True)
+        kmer_info = C_predict_probes.get_kmer_info(sequences,args)
+        Plots.EntropyPlot(
+            msa = reference_msa, 
+            kmer_info = kmer_info,
+            )
 
     # test the tool ------------------------------------------------------------
     if args.command == "test":

@@ -10,7 +10,7 @@ from fish_probes import UTIL_log
 #   - lines is a list with strings to print
 #   - outfile is either a path to a file or if it is None, it will be printed in
 #     in stdout
-def save_file(lines,outfile):
+def save_file(lines,outfile,just_print=False):
     # set temp file
     try:
         if outfile is None:
@@ -23,9 +23,12 @@ def save_file(lines,outfile):
         UTIL_log.print_error(str(e))
 
     # write lines --------------------------------------------------------------
+    
     for l in lines:
-        temp_file.write(l)
-
+        if just_print:
+            print(l)
+        else:
+            temp_file.write(l)
     # close and move to final destination --------------------------------------
     if not outfile is None:
         try:

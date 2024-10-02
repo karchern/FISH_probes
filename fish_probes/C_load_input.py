@@ -102,7 +102,7 @@ def check_input(sequences,taxonomy,args):
 #  - parse the arguments
 #  - load the input from the files and check that it is correct
 #  - return the created objects
-def load_and_check_input(args):
+def load_and_check_input(args, only_seqs = False):
     # set verbose
     global VERBOSE
     VERBOSE = args.verbose
@@ -111,6 +111,8 @@ def load_and_check_input(args):
     if VERBOSE > 2:
         UTIL_log.print_log("Load sequences")
     sequences = load_sequences(args.sequences)
+    if only_seqs:
+        return(sequences)
     if VERBOSE > 2:
         UTIL_log.print_log("Load taxonomy")
     taxonomy = load_taxonomy(args.taxonomy)

@@ -96,7 +96,7 @@ def evaluate_probe_sens_spec():
     # HEADER -------------------------------------------------------------------
     sys.stderr.write("\n")
     sys.stderr.write(UTIL_log.colour("Usage: ", "cyan"))
-    sys.stderr.write("fish_probes design ")
+    sys.stderr.write("fish_probes evaluate_probe_sens_spec ")
     sys.stderr.write(UTIL_log.colour("-s ", "blue"))
     sys.stderr.write("<seq> ")
     sys.stderr.write(UTIL_log.colour("-t ", "blue"))
@@ -120,6 +120,39 @@ def evaluate_probe_sens_spec():
     sys.stderr.write(UTIL_log.colour("   -pte  ","blue"))
     sys.stderr.write("STR     ")
     sys.stderr.write("string with k-mer to evaluate")
+    sys.stderr.write(UTIL_log.colour("\n", "magenta"))
+
+    sys.stderr.write(UTIL_log.colour("   -o  ","blue"))
+    sys.stderr.write("FILE    ")
+    sys.stderr.write("output file name")
+    sys.stderr.write(UTIL_log.colour(" [stdout]\n", "magenta"))
+
+    sys.stderr.write(UTIL_log.colour("   -v  ","blue"))
+    sys.stderr.write("INT     ")
+    sys.stderr.write("verbose level: 1=error, 2=warning, 3=message, 4+=debugging")
+    sys.stderr.write(UTIL_log.colour(" [3]\n", "magenta"))
+
+def get_entropy_plot():
+    # HEADER -------------------------------------------------------------------
+    sys.stderr.write("\n")
+    sys.stderr.write(UTIL_log.colour("Usage: ", "cyan"))
+    sys.stderr.write("fish_probes get_entropy_plot ")
+    sys.stderr.write(UTIL_log.colour("-s ", "blue"))
+    sys.stderr.write("<seq> ")
+    sys.stderr.write(UTIL_log.colour("-pte ", "blue"))
+    sys.stderr.write("<probes to evaluate>")
+
+    sys.stderr.write(" [option]\n\n")
+
+    # PARAMETERS ---------------------------------------------------------------
+    sys.stderr.write(UTIL_log.colour("   -s  ","blue"))
+    sys.stderr.write("FILE    ")
+    sys.stderr.write("fasta file with a 16S set sequence set where you know your probes are represented.")
+    sys.stderr.write(UTIL_log.colour("\n", "magenta"))
+
+    sys.stderr.write(UTIL_log.colour("   -pte  ","blue"))
+    sys.stderr.write("STR     ")
+    sys.stderr.write("COMMA-SEPERATED string with k-mers to evaluate")
     sys.stderr.write(UTIL_log.colour("\n", "magenta"))
 
     sys.stderr.write(UTIL_log.colour("   -o  ","blue"))
