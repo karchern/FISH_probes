@@ -44,10 +44,11 @@ def main():
         sequences = C_load_input.load_and_check_input(args, only_seqs = True)
         kmer_map = json.load(open(args.taxon_probe_map))
         kmer_info = C_predict_probes.get_kmer_info(sequences, kmer_map)
-        Plots.EntropyPlot(
+        entropy_plot = Plots.EntropyPlot(
             msa = reference_msa, 
             kmer_info = kmer_info,
             )
+        entropy_plot.plot_object.savefig(args.outfile)
 
     # test the tool ------------------------------------------------------------
     if args.command == "test":

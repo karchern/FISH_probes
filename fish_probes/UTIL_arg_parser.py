@@ -139,6 +139,9 @@ def input_parser(tool_version):
         if args.taxon_probe_map is None:
             UTIL_print_menus.get_entropy_plot()
             UTIL_log.print_error("Missing -pte_map")
+        if args.outfile is None:
+            UTIL_print_menus.get_entropy_plot()
+            UTIL_log.print_error("Missing -o")
 
     return args
 

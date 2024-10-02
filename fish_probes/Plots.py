@@ -29,7 +29,7 @@ class EntropyPlot():
         msa: MSA.MSA,
         kmer_info: list[list],
         padding_for_alignment = 100
-    ):
+    ) -> plt:
         for info in kmer_info:
             taxon = info[0]
             probe = info[1]
@@ -53,11 +53,11 @@ class EntropyPlot():
             #print(f"Length of alignment: {len_of_alignment}")
             info.extend([start_pos_of_probe_on_ref_al, start_pos_of_alignment_in_extended_probe_sequence, probe, len(probe), padding_for_alignment])
 
-        plot_object = self.entropy_plot(
+        self.plot_object = self.entropy_plot(
             msa = msa,
             probe_positions = kmer_info,
         )
-        plt.show()
+
 
     def entropy_plot(
         self,
