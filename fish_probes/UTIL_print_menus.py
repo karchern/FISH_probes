@@ -153,9 +153,9 @@ def get_entropy_plot():
     sys.stderr.write("fasta file with a 16S set sequence set where you know your probes are represented.")
     sys.stderr.write(UTIL_log.colour("\n", "magenta"))
 
-    sys.stderr.write(UTIL_log.colour("   -pte  ","blue"))
+    sys.stderr.write(UTIL_log.colour("   -pte_map  ","blue"))
     sys.stderr.write("STR     ")
-    sys.stderr.write("COMMA-SEPERATED string with k-mers to evaluate")
+    sys.stderr.write("JSON file mapping taxa to their probe sequences")
     sys.stderr.write(UTIL_log.colour("\n", "magenta"))
 
     sys.stderr.write(UTIL_log.colour("   -o  ","blue"))
