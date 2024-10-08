@@ -33,6 +33,9 @@ def main_message(tool_version):
     str_msg = str_msg+UTIL_log.colour("   evaluate_probe_sens_spec         ", "green_bold")
     str_msg = str_msg+"Evaluate the sensitivity and specificity of single probe\n"
 
+    str_msg = str_msg+UTIL_log.colour("   get_entropy_plot         ", "green_bold")
+    str_msg = str_msg+"Evaluate position along 16S and entropy of probe sets\n"
+
     # CONCLUDING ---------------------------------------------------------------
     str_msg = str_msg+"\nType fish_probes <command> to print the help for a specific command"
 
