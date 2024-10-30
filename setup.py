@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'biopython',
         'matplotlib',
+        "importlib-resources"
     ],
     include_package_data=True,
 )
